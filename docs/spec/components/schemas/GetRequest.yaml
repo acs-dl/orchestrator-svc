@@ -1,0 +1,26 @@
+type: object
+required:
+  - module
+  - payload
+  - status
+properties:
+  module:
+    type: string
+    description: Module to grant permission
+    example: "github"
+  payload:
+    type: object
+    format: json.RawMessage
+    description: Already built payload to grant permission
+  status:
+    type: string
+    description: Status of the request
+    example: "pending"
+    enum:
+      - "created"
+      - "pending"
+      - "finished"
+      - "failed"
+  error:
+    type: string
+    description: Error during request processing

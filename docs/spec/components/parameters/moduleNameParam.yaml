@@ -1,0 +1,9 @@
+in: query
+name: 'filter[moduleName]'
+required: true
+schema:
+  type: string
+  description: >-
+    Filter by module name. If moduleNameParam is not specified, all modules are
+    returned.
+  example: "github"

@@ -1,0 +1,17 @@
+get:
+  tags: [ Requests ]
+  summary: Get request by id
+  operationId: getRequestById
+  parameters:
+    - $ref: '#/components/parameters/requestIdParam'
+  responses:
+    '200':
+      description: Success
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                type: object
+                $ref: '#/components/schemas/Request'

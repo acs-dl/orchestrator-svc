@@ -1,0 +1,13 @@
+type: object
+required:
+  - module
+  - payload
+properties:
+  module:
+    type: string
+    description: Module to grant permission
+    example: "github"
+  payload:
+    type: object
+    format: json.RawMessage
+    description: Already built payload to grant permission

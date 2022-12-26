@@ -1,0 +1,7 @@
+name: id
+in: path
+description: The uid of the request
+required: true
+schema:
+  type: string
+  example: "1"

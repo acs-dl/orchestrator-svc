@@ -1,0 +1,25 @@
+post:
+  tags: [ Modules ]
+  summary: Add Module
+  operationId: addModule
+  requestBody:
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            data:
+              type: object
+              $ref: '#/components/schemas/Module'
+  responses:
+    '202':
+      description: Accepted
+delete:
+  tags: [ Modules ]
+  summary: Delete Module
+  operationId: deleteModule
+  parameters:
+    - $ref: '#/components/parameters/moduleNameParam'
+  responses:
+    '202':
+      description: Accepted

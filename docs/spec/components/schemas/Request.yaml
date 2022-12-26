@@ -1,0 +1,18 @@
+allOf:
+  - $ref: '#/components/schemas/RequestKey'
+  - type: object
+    required:
+      - attributes
+      - relationships
+    properties:
+      attributes:
+        oneOf:
+          - $ref: '#/components/schemas/CreateRequest'
+          - $ref: '#/components/schemas/GetRequest'
+      relationships:
+        type: object
+        required:
+          - user
+        properties:
+          user:
+            $ref: '#/components/schemas/UserKey'
