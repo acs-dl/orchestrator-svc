@@ -37,6 +37,7 @@ func CreateRequest(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	ape.Render(w, newCreateRequestResponse(requestData))
 }
 
 func newCreateRequestResponse(request data.Request) resources.Request {

@@ -15,6 +15,7 @@ type Config interface {
 	types.Copuser
 	comfig.Listenerer
 	Publisher() *message.Publisher
+	Subscriber() *message.Subscriber
 }
 
 type config struct {
@@ -24,7 +25,8 @@ type config struct {
 	comfig.Listenerer
 	getter kv.Getter
 
-	publisher comfig.Once
+	subscriber comfig.Once
+	publisher  comfig.Once
 }
 
 func New(getter kv.Getter) Config {

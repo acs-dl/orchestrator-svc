@@ -22,14 +22,17 @@ type Receiver struct {
 	requestsQ  data.RequestQ
 }
 
-func NewReceiver(subscriber *message.Subscriber) *Receiver {
+func NewReceiver(subscriber *message.Subscriber, modulesQ data.ModuleQ, requestsQ data.RequestQ) *Receiver {
 	return &Receiver{
 		subscriber: subscriber,
+		log:        logan.New().WithField("service", serviceName),
+		modulesQ:   modulesQ,
+		requestsQ:  requestsQ,
 	}
 }
 
 func (r *Receiver) Run(ctx context.Context) {
-	running.WithBackOff(ctx, r.log,
+	go running.WithBackOff(ctx, r.log,
 		serviceName,
 		r.listenMessages,
 		30*time.Second,

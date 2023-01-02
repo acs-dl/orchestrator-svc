@@ -26,7 +26,7 @@ func NewSender(publisher *message.Publisher, requestQ data.RequestQ) *Sender {
 }
 
 func (s *Sender) Run(ctx context.Context) error {
-	running.WithBackOff(ctx, s.log,
+	go running.WithBackOff(ctx, s.log,
 		serviceName,
 		s.processMessages,
 		30*time.Second,

@@ -1,6 +1,9 @@
 package service
 
 import (
+	"github.com/ThreeDotsLabs/watermill/message"
+	"gitlab.com/distributed_lab/acs/orchestrator/internal/data"
+	"gitlab.com/distributed_lab/acs/orchestrator/internal/data/postgres"
 	"net"
 	"net/http"
 
@@ -11,9 +14,13 @@ import (
 )
 
 type service struct {
-	log      *logan.Entry
-	copus    types.Copus
-	listener net.Listener
+	log        *logan.Entry
+	copus      types.Copus
+	listener   net.Listener
+	modulesQ   data.ModuleQ
+	requestsQ  data.RequestQ
+	publisher  *message.Publisher
+	subscriber *message.Subscriber
 }
 
 func (s *service) run() error {
@@ -29,9 +36,13 @@ func (s *service) run() error {
 
 func newService(cfg config.Config) *service {
 	return &service{
-		log:      cfg.Log(),
-		copus:    cfg.Copus(),
-		listener: cfg.Listener(),
+		log:        cfg.Log(),
+		copus:      cfg.Copus(),
+		listener:   cfg.Listener(),
+		modulesQ:   postgres.NewModuleQ(cfg.DB().Clone()),
+		requestsQ:  postgres.NewRequestsQ(cfg.DB().Clone()),
+		publisher:  cfg.Publisher(),
+		subscriber: cfg.Subscriber(),
 	}
 }
 
