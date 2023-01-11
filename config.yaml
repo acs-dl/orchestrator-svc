@@ -5,6 +5,12 @@ log:
 db:
   url: "postgres://orchestrator:orchestrator@localhost:5432/orchestrator?sslmode=disable"
 
+publisher:
+  amqp_url: "amqp://guest:guest@localhost:5672/"
+
+subscriber:
+  amqp_url: "amqp://guest:guest@localhost:5672/"
+
 listener:
   addr: :8000
 

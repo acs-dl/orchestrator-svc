@@ -23,6 +23,7 @@ func NewSender(publisher *amqp.Publisher, requestQ data.RequestQ) *Sender {
 	return &Sender{
 		publisher: publisher,
 		requestQ:  requestQ,
+		log:       logan.New().WithField("service", serviceName),
 	}
 }
 

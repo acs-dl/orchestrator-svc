@@ -18,8 +18,9 @@ type Request struct {
 	Payload    json.RawMessage `json:"payload" db:"payload"`
 	Status     RequestStatus   `json:"status" db:"status"`
 	Error      *string         `json:"error,omitempty" db:"error,omitempty"`
-	CreatedAt  string          `json:"created_at"`
+	CreatedAt  string          `json:"created_at" db:"created_at"`
 	Module     *Module         `json:"module,omitempty" structs:"module,omitempty"`
+	ModuleName string          `json:"module_name" db:"module_name"`
 }
 
 type RequestQ interface {
