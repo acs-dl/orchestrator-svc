@@ -2,6 +2,7 @@ package sender
 
 import (
 	"context"
+	"github.com/ThreeDotsLabs/watermill-amqp/v2/pkg/amqp"
 	"github.com/ThreeDotsLabs/watermill/message"
 	"github.com/pkg/errors"
 	"gitlab.com/distributed_lab/acs/orchestrator/internal/data"
@@ -13,12 +14,12 @@ import (
 const serviceName = "sender"
 
 type Sender struct {
-	publisher *message.Publisher
+	publisher *amqp.Publisher
 	requestQ  data.RequestQ
 	log       *logan.Entry
 }
 
-func NewSender(publisher *message.Publisher, requestQ data.RequestQ) *Sender {
+func NewSender(publisher *amqp.Publisher, requestQ data.RequestQ) *Sender {
 	return &Sender{
 		publisher: publisher,
 		requestQ:  requestQ,

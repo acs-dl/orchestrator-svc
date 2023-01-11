@@ -1,6 +1,7 @@
 package service
 
 import (
+	"github.com/ThreeDotsLabs/watermill-amqp/v2/pkg/amqp"
 	"github.com/ThreeDotsLabs/watermill/message"
 	"gitlab.com/distributed_lab/acs/orchestrator/internal/data"
 	"gitlab.com/distributed_lab/acs/orchestrator/internal/data/postgres"
@@ -19,7 +20,7 @@ type service struct {
 	listener   net.Listener
 	modulesQ   data.ModuleQ
 	requestsQ  data.RequestQ
-	publisher  *message.Publisher
+	publisher  *amqp.Publisher
 	subscriber *message.Subscriber
 }
 

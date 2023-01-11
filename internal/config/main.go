@@ -1,6 +1,7 @@
 package config
 
 import (
+	"github.com/ThreeDotsLabs/watermill-amqp/v2/pkg/amqp"
 	"github.com/ThreeDotsLabs/watermill/message"
 	"gitlab.com/distributed_lab/kit/comfig"
 	"gitlab.com/distributed_lab/kit/copus"
@@ -14,7 +15,7 @@ type Config interface {
 	pgdb.Databaser
 	types.Copuser
 	comfig.Listenerer
-	Publisher() *message.Publisher
+	Publisher() *amqp.Publisher
 	Subscriber() *message.Subscriber
 }
 

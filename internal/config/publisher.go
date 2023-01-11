@@ -3,7 +3,6 @@ package config
 import (
 	"github.com/ThreeDotsLabs/watermill"
 	"github.com/ThreeDotsLabs/watermill-amqp/v2/pkg/amqp"
-	"github.com/ThreeDotsLabs/watermill/message"
 	"github.com/pkg/errors"
 	"gitlab.com/distributed_lab/figure"
 	"gitlab.com/distributed_lab/kit/kv"
@@ -13,7 +12,7 @@ type PublisherConfig struct {
 	AmqpUrl string `fig:"amqp_url,required"`
 }
 
-func (c *config) Publisher() *message.Publisher {
+func (c *config) Publisher() *amqp.Publisher {
 	return c.publisher.Do(func() interface{} {
 		var cfg PublisherConfig
 
@@ -37,5 +36,5 @@ func (c *config) Publisher() *message.Publisher {
 		}
 
 		return publisher
-	}).(*message.Publisher)
+	}).(*amqp.Publisher)
 }
