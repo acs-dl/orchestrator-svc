@@ -2,7 +2,6 @@ package config
 
 import (
 	"github.com/ThreeDotsLabs/watermill-amqp/v2/pkg/amqp"
-	"github.com/ThreeDotsLabs/watermill/message"
 	"gitlab.com/distributed_lab/kit/comfig"
 	"gitlab.com/distributed_lab/kit/copus"
 	"gitlab.com/distributed_lab/kit/copus/types"
@@ -16,7 +15,7 @@ type Config interface {
 	types.Copuser
 	comfig.Listenerer
 	Publisher() *amqp.Publisher
-	Subscriber() *message.Subscriber
+	Subscriber() *amqp.Subscriber
 }
 
 type config struct {

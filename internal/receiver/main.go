@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/ThreeDotsLabs/watermill-amqp/v2/pkg/amqp"
 	"github.com/ThreeDotsLabs/watermill/message"
 	"gitlab.com/distributed_lab/acs/orchestrator/internal/data"
 	"gitlab.com/distributed_lab/acs/orchestrator/internal/types"
@@ -16,13 +17,13 @@ import (
 const serviceName = "receiver"
 
 type Receiver struct {
-	subscriber *message.Subscriber
+	subscriber *amqp.Subscriber
 	log        *logan.Entry
 	modulesQ   data.ModuleQ
 	requestsQ  data.RequestQ
 }
 
-func NewReceiver(subscriber *message.Subscriber, modulesQ data.ModuleQ, requestsQ data.RequestQ) *Receiver {
+func NewReceiver(subscriber *amqp.Subscriber, modulesQ data.ModuleQ, requestsQ data.RequestQ) *Receiver {
 	return &Receiver{
 		subscriber: subscriber,
 		log:        logan.New().WithField("service", serviceName),

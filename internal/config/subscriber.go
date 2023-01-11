@@ -3,7 +3,6 @@ package config
 import (
 	"github.com/ThreeDotsLabs/watermill"
 	"github.com/ThreeDotsLabs/watermill-amqp/v2/pkg/amqp"
-	"github.com/ThreeDotsLabs/watermill/message"
 	"gitlab.com/distributed_lab/figure"
 	"gitlab.com/distributed_lab/kit/kv"
 	"gitlab.com/distributed_lab/logan/v3/errors"
@@ -13,7 +12,7 @@ type SubscriberConfig struct {
 	AmqpUrl string `fig:"amqp_url,required"`
 }
 
-func (c *config) Subscriber() *message.Subscriber {
+func (c *config) Subscriber() *amqp.Subscriber {
 	return c.subscriber.Do(func() interface{} {
 		var cfg SubscriberConfig
 
@@ -41,5 +40,5 @@ func (c *config) Subscriber() *message.Subscriber {
 		}
 
 		return subscriber
-	}).(*message.Subscriber)
+	}).(*amqp.Subscriber)
 }
