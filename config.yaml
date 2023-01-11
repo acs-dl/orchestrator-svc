@@ -3,7 +3,7 @@ log:
   disable_sentry: true
 
 db:
-  url: db_url
+  url: "postgres://orchestrator:orchestrator@localhost:5432/orchestrator?sslmode=disable"
 
 listener:
   addr: :8000

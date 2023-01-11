@@ -13,6 +13,7 @@ CREATE TABLE IF NOT EXISTS requests (
     to_user_id BIGINT NOT NULL,
     payload JSONB NOT NULL,
     status request_status_enum NOT NULL DEFAULT 'created',
+    module_name TEXT NOT NULL,
     error TEXT,
     created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_modules_name FOREIGN KEY (module_name) REFERENCES modules (name) ON DELETE CASCADE
