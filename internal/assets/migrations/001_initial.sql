@@ -2,10 +2,9 @@
 
 CREATE TYPE request_status_enum AS ENUM ('created', 'pending', 'finished', 'failed');
 
-CREATE TABLE IF NOT EXISTS modules
-(
+CREATE TABLE IF NOT EXISTS modules (
     name TEXT PRIMARY KEY,
-    endpoint TEXT NOT NULL,
+    endpoint TEXT NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS requests (
@@ -16,7 +15,7 @@ CREATE TABLE IF NOT EXISTS requests (
     status request_status_enum NOT NULL DEFAULT 'created',
     error TEXT,
     created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT fk_modules_name FOREIGN KEY (module_name) REFERENCES modules (name) ON DELETE CASCADE,
+    CONSTRAINT fk_modules_name FOREIGN KEY (module_name) REFERENCES modules (name) ON DELETE CASCADE
 );
 
 -- +migrate Down
