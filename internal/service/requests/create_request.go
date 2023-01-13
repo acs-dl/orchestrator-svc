@@ -7,7 +7,7 @@ import (
 )
 
 type CreateRequestRequest struct {
-	Request resources.Request `json:"request"`
+	Request resources.Request `json:"data"`
 }
 
 func NewCreateRequestRequest(r *http.Request) (CreateRequestRequest, error) {

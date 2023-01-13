@@ -66,6 +66,8 @@ func (r requestsQ) Select() ([]data.Request, error) {
 
 func (r requestsQ) Insert(request data.Request) error {
 	insertStmt := sq.Insert(requestsTable).SetMap(structs.Map(request))
+	lox, _, _ := insertStmt.ToSql()
+	fmt.Println(lox)
 	err := r.db.Exec(insertStmt)
 	return errors.Wrap(err, "failed to insert request")
 }

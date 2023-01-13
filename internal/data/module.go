@@ -1,8 +1,8 @@
 package data
 
 type Module struct {
-	Endpoint *string `json:"endpoint"`
-	Name     string  `json:"name"`
+	Endpoint *string `json:"endpoint" structs:"endpoint"`
+	Name     string  `json:"name" structs:"name"`
 }
 
 type ModuleQ interface {

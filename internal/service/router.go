@@ -47,6 +47,6 @@ func (s *service) startListener(ctx context.Context) error {
 
 func (s *service) startSender(ctx context.Context) error {
 	s.log.Info("Starting sender")
-	sender.NewSender(s.publisher, s.requestsQ).Run(ctx)
+	sender.NewSender(s.publisher, s.requestsQ, s.modulesQ).Run(ctx)
 	return nil
 }

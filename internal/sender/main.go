@@ -16,13 +16,15 @@ const serviceName = "sender"
 type Sender struct {
 	publisher *amqp.Publisher
 	requestQ  data.RequestQ
+	moduleQ   data.ModuleQ
 	log       *logan.Entry
 }
 
-func NewSender(publisher *amqp.Publisher, requestQ data.RequestQ) *Sender {
+func NewSender(publisher *amqp.Publisher, requestQ data.RequestQ, moduleQ data.ModuleQ) *Sender {
 	return &Sender{
 		publisher: publisher,
 		requestQ:  requestQ,
+		moduleQ:   moduleQ,
 		log:       logan.New().WithField("service", serviceName),
 	}
 }
@@ -47,7 +49,13 @@ func (s *Sender) processMessages(ctx context.Context) error {
 
 	for _, message := range messagesToSend {
 		s.log.Debug("started processing notification with id ", message.ID)
-		err = (*s.publisher).Publish(*message.Module.Endpoint, s.buildMessage(message))
+
+		module, err := s.moduleQ.FilterByNames(message.ModuleName).Get()
+		if err != nil {
+			return errors.Wrap(err, "failed to get full module for notification: "+message.ID)
+		}
+
+		err = s.publisher.Publish(*module.Endpoint, s.buildMessage(message))
 		if err != nil {
 			return errors.Wrap(err, "failed to process notification: "+message.ID)
 		}

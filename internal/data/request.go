@@ -12,15 +12,15 @@ const (
 )
 
 type Request struct {
-	ID         string          `json:"id" db:"id" structs:"-"`
-	FromUserID string          `json:"from_user_id" db:"from_user_id"`
-	ToUserID   string          `json:"to_user_id" db:"to_user_id"`
-	Payload    json.RawMessage `json:"payload" db:"payload"`
-	Status     RequestStatus   `json:"status" db:"status"`
-	Error      *string         `json:"error,omitempty" db:"error,omitempty"`
-	CreatedAt  string          `json:"created_at" db:"created_at"`
+	ID         string          `json:"id" db:"id" structs:"id"`
+	FromUserID int64           `json:"from_user_id" db:"from_user_id" structs:"from_user_id,omitempty"`
+	ToUserID   int64           `json:"to_user_id" db:"to_user_id" structs:"to_user_id,omitempty"`
+	Payload    json.RawMessage `json:"payload" db:"payload" structs:"payload"`
+	Status     RequestStatus   `json:"status" db:"status" structs:"status,omitempty"`
+	Error      *string         `json:"error,omitempty" db:"error,omitempty" structs:"error,omitempty"`
+	CreatedAt  string          `json:"created_at" db:"created_at" structs:"created_at,omitempty"`
 	Module     *Module         `json:"module,omitempty" structs:"module,omitempty"`
-	ModuleName string          `json:"module_name" db:"module_name"`
+	ModuleName string          `json:"module_name" db:"module_name" structs:"module_name,omitempty"`
 }
 
 type RequestQ interface {
