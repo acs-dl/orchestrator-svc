@@ -45,6 +45,7 @@ func CreateRequest(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	helpers.Log(r).Infof("successfully created request with id `%s`", requestData.ID)
 	ape.Render(w, newCreateRequestResponse(requestData))
 }
 

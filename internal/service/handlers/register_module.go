@@ -29,5 +29,6 @@ func RegisterModule(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	helpers.Log(r).Infof("successfully register module `%s`", module.Name)
 	ape.Render(w, http.StatusAccepted)
 }

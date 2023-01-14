@@ -60,7 +60,7 @@ func (r *Receiver) startSubscriber(ctx context.Context, topic string) {
 	go running.WithBackOff(ctx, r.log,
 		fmt.Sprint(serviceName, "_", topic),
 		func(ctx context.Context) error {
-			return r.subscribeForTopic(ctx, topic)
+			return r.subscribeForTopic(ctx, "orchestrator") //topic)
 		},
 		30*time.Second,
 		30*time.Second,

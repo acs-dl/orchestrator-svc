@@ -48,7 +48,23 @@ func (m modulesQ) Select() ([]data.Module, error) {
 }
 
 func (m modulesQ) Insert(module data.Module) error {
-	insertStmt := sq.Insert(modulesTable).SetMap(structs.Map(module))
+	insertStmt := sq.Insert(modulesTable).SetMap(structs.Map(module)).Suffix("ON CONFLICT (name) DO NOTHING")
 	err := m.db.Exec(insertStmt)
 	return errors.Wrap(err, "failed to insert module")
+}
+
+func (m modulesQ) Delete(name string) error {
+	query := sq.Delete(modulesTable).Where(sq.Eq{"name": name})
+
+	result, err := m.db.ExecWithResult(query)
+	if err != nil {
+		return err
+	}
+
+	affectedRows, _ := result.RowsAffected()
+	if affectedRows == 0 {
+		return errors.New("no module with such name")
+	}
+
+	return nil
 }

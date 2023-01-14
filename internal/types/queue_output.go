@@ -10,7 +10,7 @@ const (
 )
 
 type QueueOutput struct {
-	ID     string       `json:"uuid"`
+	ID     string       `json:"id"`
 	Status ModuleResult `json:"status"`
 }
 

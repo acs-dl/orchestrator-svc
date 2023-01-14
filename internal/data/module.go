@@ -14,4 +14,5 @@ type ModuleQ interface {
 	Select() ([]Module, error)
 
 	Insert(module Module) error
+	Delete(name string) error
 }
