@@ -12,6 +12,7 @@ const (
 type QueueOutput struct {
 	ID     string       `json:"id"`
 	Status ModuleResult `json:"status"`
+	Error  string       `json:"error"`
 }
 
 func (mr ModuleResult) ToRequestStatus() data.RequestStatus {

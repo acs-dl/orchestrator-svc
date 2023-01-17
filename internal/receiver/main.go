@@ -99,7 +99,7 @@ func (r *Receiver) processMessage(msg *message.Message) error {
 		return errors.Wrap(err, "failed to unmarshal message "+msg.UUID)
 	}
 
-	err = r.requestsQ.FilterByIDs(queueOutput.ID).SetStatus(queueOutput.Status.ToRequestStatus())
+	err = r.requestsQ.FilterByIDs(queueOutput.ID).SetStatusError(queueOutput.Status.ToRequestStatus(), queueOutput.Error)
 	if err != nil {
 		return errors.Wrap(err, "failed to update state for notification: "+queueOutput.ID)
 	}

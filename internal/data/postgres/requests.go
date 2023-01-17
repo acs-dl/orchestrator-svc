@@ -81,3 +81,9 @@ func (r requestsQ) SetStatus(status data.RequestStatus) error {
 	err := r.db.Exec(updateStmt)
 	return errors.Wrap(err, "failed to set status")
 }
+
+func (r requestsQ) SetStatusError(status data.RequestStatus, errorMsg string) error {
+	updateStmt := r.updateBuilder.Set("status", status).Set("error", errorMsg)
+	err := r.db.Exec(updateStmt)
+	return errors.Wrap(err, "failed to set status and error")
+}

@@ -37,4 +37,5 @@ type RequestQ interface {
 	Update(request Request) error
 
 	SetStatus(status RequestStatus) error
+	SetStatusError(status RequestStatus, errorMsg string) error
 }
