@@ -1,6 +1,7 @@
 package postgres
 
 import (
+	"database/sql"
 	"fmt"
 	sq "github.com/Masterminds/squirrel"
 	"github.com/fatih/structs"
@@ -52,10 +53,10 @@ func (r requestsQ) JoinsModule() data.RequestQ {
 func (r requestsQ) Get() (*data.Request, error) {
 	var result data.Request
 	err := r.db.Get(&result, r.selectBuilder)
-	if err != nil {
-		return nil, err
+	if err == sql.ErrNoRows {
+		return nil, nil
 	}
-	return &result, nil
+	return &result, err
 }
 
 func (r requestsQ) Select() ([]data.Request, error) {

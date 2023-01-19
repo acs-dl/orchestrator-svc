@@ -1,0 +1,7 @@
+name: id
+in: path
+description: The identity id of the user
+required: true
+schema:
+  type: string
+  example: "111"
