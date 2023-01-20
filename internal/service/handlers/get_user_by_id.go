@@ -50,7 +50,7 @@ func GetUserById(w http.ResponseWriter, r *http.Request) {
 }
 
 func makeRequest(moduleName, userId string) (*resources.User, error) {
-	link := fmt.Sprintf("http://localhost:9000/integrations/%s/users/%s", moduleName, userId)
+	link := fmt.Sprintf("http://traefik:8000/integrations/%s/users/%s", moduleName, userId)
 	req, err := http.NewRequest(http.MethodGet, link, nil)
 	if err != nil {
 		return nil, errors.Wrap(err, "couldn't create request")
