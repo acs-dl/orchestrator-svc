@@ -2,6 +2,7 @@ package data
 
 type Module struct {
 	Endpoint *string `json:"endpoint" structs:"endpoint"`
+	Link     *string `json:"link" structs:"link"`
 	Name     string  `json:"name" structs:"name"`
 }
 

@@ -4,7 +4,8 @@ CREATE TYPE request_status_enum AS ENUM ('created', 'pending', 'finished', 'fail
 
 CREATE TABLE IF NOT EXISTS modules (
     name TEXT PRIMARY KEY,
-    endpoint TEXT NOT NULL
+    endpoint TEXT NOT NULL,
+    link TEXT NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS requests (
@@ -21,6 +22,6 @@ CREATE TABLE IF NOT EXISTS requests (
 
 -- +migrate Down
 
-DROP TABLE IF EXISTS modules;
 DROP TABLE IF EXISTS requests;
+DROP TABLE IF EXISTS modules;
 DROP TYPE IF EXISTS request_status_enum;

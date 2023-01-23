@@ -5,8 +5,10 @@
 package resources
 
 type ModuleAttributes struct {
-	// Module url
+	// Module endpoint for sender and others
 	Endpoint string `json:"endpoint"`
+	// Module url
+	Link string `json:"link"`
 	// Module name
 	Name string `json:"name"`
 }

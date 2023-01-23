@@ -9,12 +9,17 @@ allOf:
         required:
           - name
           - endpoint
+          - link
         properties:
           name:
             type: string
             description: Module name
             example: "github"
-          endpoint:
+          link:
             type: string
             description: Module url
-            example: "https://github-module"
+            example: "https://traefik/gitlab"
+          endpoint:
+            type: string
+            description: Module endpoint for sender and others
+            example: "gitlab"

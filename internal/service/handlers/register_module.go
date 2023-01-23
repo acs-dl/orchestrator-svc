@@ -20,6 +20,7 @@ func RegisterModule(w http.ResponseWriter, r *http.Request) {
 	module := data.Module{
 		Name:     request.Data.Attributes.Name,
 		Endpoint: &request.Data.Attributes.Endpoint,
+		Link:     &request.Data.Attributes.Link,
 	}
 
 	err = helpers.ModulesQ(r).Insert(module)
