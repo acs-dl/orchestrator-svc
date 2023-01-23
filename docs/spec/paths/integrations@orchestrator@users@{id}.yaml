@@ -1,9 +1,9 @@
 get:
-  tags: [ Requests ]
+  tags: [ Users ]
   summary: Get user by id
   operationId: getUserById
   parameters:
-    - $ref: '#/components/parameters/requestIdParam'
+    - $ref: '#/components/parameters/userIdParam'
   responses:
     '200':
       description: Success

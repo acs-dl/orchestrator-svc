@@ -20,21 +20,20 @@ func CreateRequest(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	toUserId, err := strconv.Atoi(request.Request.Relationships.User.Data.ID)
+	toUserId, err := strconv.ParseInt(request.Data.Relationships.User.Data.ID, 10, 64)
 	if err != nil {
 		helpers.Log(r).WithError(err).Error("failed to parse user id")
 		ape.RenderErr(w, problems.BadRequest(err)...)
 		return
 	}
 
-	module := data.Module{Name: request.Request.Attributes.Module}
 	requestData := data.Request{
 		ID: uuid.New().String(),
 		// TODO: add from user id
 		FromUserID: 12345,
-		ToUserID:   int64(toUserId),
-		Payload:    request.Request.Attributes.Payload,
-		ModuleName: module.Name,
+		ToUserID:   toUserId,
+		Payload:    request.Data.Attributes.Payload,
+		ModuleName: request.Data.Attributes.Module,
 		Status:     data.CREATED,
 	}
 
@@ -50,6 +49,7 @@ func CreateRequest(w http.ResponseWriter, r *http.Request) {
 }
 
 func newCreateRequestResponse(request data.Request) resources.Request {
+	key := resources.NewKeyInt64(request.ToUserID, resources.USERS)
 	return resources.Request{
 		Key: resources.Key{
 			ID:   request.ID,
@@ -60,6 +60,10 @@ func newCreateRequestResponse(request data.Request) resources.Request {
 			Payload: request.Payload,
 			Status:  string(request.Status),
 		},
-		Relationships: resources.RequestRelationships{},
+		Relationships: resources.RequestRelationships{
+			User: resources.Relation{
+				Data: &key,
+			},
+		},
 	}
 }

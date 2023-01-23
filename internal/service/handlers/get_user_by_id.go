@@ -34,7 +34,7 @@ func GetUserById(w http.ResponseWriter, r *http.Request) {
 
 	var result []resources.User
 	for _, module := range modules {
-		returned, err := makeRequest(module.Name, request.Id)
+		returned, err := makeRequest(*module.Link, request.Id)
 		if err != nil {
 			helpers.Log(r).WithError(err).Errorf("failed to get user with id `%s` from module `%s`", request.Id, module.Name)
 			ape.RenderErr(w, problems.InternalError())
@@ -49,8 +49,8 @@ func GetUserById(w http.ResponseWriter, r *http.Request) {
 	ape.Render(w, newGetUserResponse(result))
 }
 
-func makeRequest(moduleName, userId string) (*resources.User, error) {
-	link := fmt.Sprintf("http://traefik:8000/_/api/integrations/%s/users/%s", moduleName, userId)
+func makeRequest(moduleLink, userId string) (*resources.User, error) {
+	link := fmt.Sprintf(moduleLink+"/users/%s", userId)
 	req, err := http.NewRequest(http.MethodGet, link, nil)
 	if err != nil {
 		return nil, errors.Wrap(err, "couldn't create request")
