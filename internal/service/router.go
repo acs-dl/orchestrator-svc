@@ -29,6 +29,7 @@ func (s *service) router() chi.Router {
 	r.Route("/integrations/orchestrator", func(r chi.Router) {
 		r.Route("/modules", func(r chi.Router) {
 			r.Post("/", handlers.RegisterModule)
+			r.Get("/", handlers.GetModules)
 			r.Delete("/{name}", handlers.UnregisterModule)
 		})
 		r.Route("/requests", func(r chi.Router) {

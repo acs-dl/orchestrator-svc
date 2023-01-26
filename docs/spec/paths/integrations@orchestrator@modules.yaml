@@ -23,3 +23,18 @@ delete:
   responses:
     '202':
       description: Accepted
+get:
+  tags: [ Modules ]
+  summary: Get modules with icons
+  operationId: getModulesIcons
+  responses:
+    '200':
+      description: Success
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                type: object
+                $ref: '#/components/schemas/ModuleIcon'

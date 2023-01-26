@@ -12,8 +12,8 @@ allOf:
       relationships:
         type: object
         required:
-          - data
+          - user
         properties:
-          data:
+          user:
             type: object
             $ref: '#/components/schemas/UserKey'
