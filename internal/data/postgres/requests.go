@@ -88,3 +88,17 @@ func (r requestsQ) SetStatusError(status data.RequestStatus, errorMsg string) er
 	err := r.db.Exec(updateStmt)
 	return errors.Wrap(err, "failed to set status and error")
 }
+
+func (r requestsQ) FilterByFromIds(ids ...int64) data.RequestQ {
+	stmt := sq.Eq{requestsTable + ".from_user_id": ids}
+	r.selectBuilder = r.selectBuilder.Where(stmt)
+	r.updateBuilder = r.updateBuilder.Where(stmt)
+	return r
+}
+
+func (r requestsQ) FilterByToIds(ids ...int64) data.RequestQ {
+	stmt := sq.Eq{requestsTable + ".to_user_id": ids}
+	r.selectBuilder = r.selectBuilder.Where(stmt)
+	r.updateBuilder = r.updateBuilder.Where(stmt)
+	return r
+}

@@ -45,10 +45,10 @@ func CreateRequest(w http.ResponseWriter, r *http.Request) {
 	}
 
 	helpers.Log(r).Infof("successfully created request with id `%s`", requestData.ID)
-	ape.Render(w, newCreateRequestResponse(requestData))
+	ape.Render(w, newRequestResponse(requestData))
 }
 
-func newCreateRequestResponse(request data.Request) resources.Request {
+func newRequest(request data.Request) resources.Request {
 	key := resources.NewKeyInt64(request.ToUserID, resources.USERS)
 	return resources.Request{
 		Key: resources.Key{
@@ -65,5 +65,11 @@ func newCreateRequestResponse(request data.Request) resources.Request {
 				Data: &key,
 			},
 		},
+	}
+}
+
+func newRequestResponse(request data.Request) resources.RequestResponse {
+	return resources.RequestResponse{
+		Data: newRequest(request),
 	}
 }

@@ -34,6 +34,7 @@ func (s *service) router() chi.Router {
 		})
 		r.Route("/requests", func(r chi.Router) {
 			r.Post("/", handlers.CreateRequest)
+			r.Get("/", handlers.GetRequests)
 			r.Get("/{id}", handlers.GetRequest)
 		})
 		r.Route("/users", func(r chi.Router) {

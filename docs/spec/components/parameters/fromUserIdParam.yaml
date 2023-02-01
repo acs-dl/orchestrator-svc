@@ -1,0 +1,7 @@
+name: id
+in: path
+description: The identity id of the user from who was action
+required: true
+schema:
+  type: int
+  example: 111
