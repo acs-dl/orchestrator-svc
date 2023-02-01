@@ -38,5 +38,7 @@ get:
             type: object
             properties:
               data:
-                type: object
-                $ref: '#/components/schemas/Request'
+                type: array
+                items:
+                  type: object
+                  $ref: '#/components/schemas/Request'
