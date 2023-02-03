@@ -16,6 +16,7 @@ type Config interface {
 	comfig.Listenerer
 	Publisher() *amqp.Publisher
 	Subscriber() *amqp.Subscriber
+	JwtParams() *JwtCfg
 }
 
 type config struct {
@@ -27,6 +28,7 @@ type config struct {
 
 	subscriber comfig.Once
 	publisher  comfig.Once
+	jwtCfg     comfig.Once
 }
 
 func New(getter kv.Getter) Config {

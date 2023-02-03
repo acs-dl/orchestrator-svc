@@ -1,5 +1,5 @@
-# github.com/Masterminds/squirrel v1.4.0
-## explicit
+# github.com/Masterminds/squirrel v1.5.3
+## explicit; go 1.14
 github.com/Masterminds/squirrel
 # github.com/ThreeDotsLabs/watermill v1.2.0-rc.7
 ## explicit; go 1.17
@@ -45,9 +45,14 @@ github.com/go-chi/chi/middleware
 # github.com/go-gorp/gorp/v3 v3.0.2
 ## explicit; go 1.13
 github.com/go-gorp/gorp/v3
+# github.com/go-ozzo/ozzo-validation v3.6.0+incompatible
+## explicit
 # github.com/go-ozzo/ozzo-validation/v4 v4.2.1
 ## explicit; go 1.13
 github.com/go-ozzo/ozzo-validation/v4
+# github.com/golang-jwt/jwt v3.2.2+incompatible
+## explicit
+github.com/golang-jwt/jwt
 # github.com/google/jsonapi v0.0.0-20200226002910-c8283f632fb7
 ## explicit
 github.com/google/jsonapi
@@ -136,11 +141,16 @@ github.com/spf13/viper
 # github.com/subosito/gotenv v1.2.0
 ## explicit
 github.com/subosito/gotenv
+# gitlab.com/distributed_lab/acs/auth v0.0.0-20230202160032-c779e38da077
+## explicit; go 1.19
+gitlab.com/distributed_lab/acs/auth/internal/data
+gitlab.com/distributed_lab/acs/auth/internal/service/helpers
+gitlab.com/distributed_lab/acs/auth/middlewares
 # gitlab.com/distributed_lab/ape v1.7.1
 ## explicit; go 1.14
 gitlab.com/distributed_lab/ape
 gitlab.com/distributed_lab/ape/problems
-# gitlab.com/distributed_lab/figure v2.1.0+incompatible
+# gitlab.com/distributed_lab/figure v2.1.2+incompatible
 ## explicit
 gitlab.com/distributed_lab/figure
 # gitlab.com/distributed_lab/kit v1.11.1
@@ -171,14 +181,16 @@ gitlab.com/distributed_lab/running
 gitlab.com/distributed_lab/urlval
 gitlab.com/distributed_lab/urlval/internal
 gitlab.com/distributed_lab/urlval/internal/betterreflect
-# golang.org/x/net v0.0.0-20220325170049-de3da57026de
+# golang.org/x/crypto v0.4.0
 ## explicit; go 1.17
-# golang.org/x/sys v0.0.0-20211216021012-1d35b9e2eb4e
+# golang.org/x/net v0.3.0
+## explicit; go 1.17
+# golang.org/x/sys v0.3.0
 ## explicit; go 1.17
 golang.org/x/sys/internal/unsafeheader
 golang.org/x/sys/unix
 golang.org/x/sys/windows
-# golang.org/x/text v0.3.7
+# golang.org/x/text v0.5.0
 ## explicit; go 1.17
 golang.org/x/text/transform
 golang.org/x/text/unicode/norm

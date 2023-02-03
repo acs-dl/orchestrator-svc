@@ -21,6 +21,7 @@ type service struct {
 	requestsQ  data.RequestQ
 	publisher  *amqp.Publisher
 	subscriber *amqp.Subscriber
+	jwt        *config.JwtCfg
 }
 
 func (s *service) run() error {
@@ -43,6 +44,7 @@ func newService(cfg config.Config) *service {
 		requestsQ:  postgres.NewRequestsQ(cfg.DB().Clone()),
 		publisher:  cfg.Publisher(),
 		subscriber: cfg.Subscriber(),
+		jwt:        cfg.JwtParams(),
 	}
 }
 

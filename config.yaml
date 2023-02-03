@@ -14,6 +14,11 @@ subscriber:
 listener:
   addr: :8000
 
+jwt:
+  secret: SuPeR SeCrEt PhRaSe
+  refresh_life: 6h
+  access_life: 10m5s
+
 cop:
   disabled: true
   endpoint: "http://..."

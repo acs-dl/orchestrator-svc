@@ -94,7 +94,7 @@ func (f *Figurator) Please() error {
 func (f *Figurator) SetField(fieldValue reflect.Value, field reflect.StructField, keyTag string) error {
 	tag, err := parseFieldTag(field, keyTag)
 	if err != nil {
-		return errors.Wrap(err, "failed to parse tag", logan.F{"tag": tag.Key})
+		return errors.Wrap(err, "failed to parse tag")
 	}
 
 	if tag == nil {
@@ -106,9 +106,10 @@ func (f *Figurator) SetField(fieldValue reflect.Value, field reflect.StructField
 	raw, hasRaw := f.values[tag.Key]
 
 	logFields := logan.F{
-		"field": field.Name,
-		"type":  field.Type.Name(),
-		"raw":   raw,
+		"field":     field.Name,
+		"type":      field.Type.Name(),
+		"full_type": field.Type.String(),
+		"raw":       raw,
 	}
 
 	if !hasHook && fieldValue.Kind() != reflect.Struct {
@@ -159,9 +160,9 @@ func please(rawValues map[string]interface{}, hooks Hooks, fieldValue reflect.Va
 		fieldType := tpe.Field(fi)
 		fieldValue := vle.Field(fi)
 
-		tag, err := parseFieldTag(fieldType, keyTag)
+		_, err := parseFieldTag(fieldType, keyTag)
 		if err != nil {
-			return errors.Wrap(err, "failed to parse tag", logan.F{"tag": tag.Key})
+			return errors.Wrap(err, "failed to parse tag")
 		}
 
 		if err := setField(fieldValue, fieldType, keyTag, rawValues, hooks); err != nil {
@@ -175,7 +176,7 @@ func please(rawValues map[string]interface{}, hooks Hooks, fieldValue reflect.Va
 func setField(fieldValue reflect.Value, field reflect.StructField, keyTag string, values map[string]interface{}, hooks Hooks) error {
 	tag, err := parseFieldTag(field, keyTag)
 	if err != nil {
-		return errors.Wrap(err, "failed to parse tag", logan.F{"tag": tag.Key})
+		return errors.Wrap(err, "failed to parse tag")
 	}
 	if tag == nil {
 		return nil
