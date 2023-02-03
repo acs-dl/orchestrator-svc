@@ -68,7 +68,7 @@ Build and Publish Tag:
   interruptible: true
 
 Code-Review:
-  image: golang:1.16
+  image: golang:1.19
   stage: code-review
   only:
     - merge_requests
