@@ -56,10 +56,11 @@ func newRequest(request data.Request) resources.Request {
 			Type: resources.REQUESTS,
 		},
 		Attributes: resources.RequestAttributes{
-			Module:  request.ModuleName,
-			Payload: request.Payload,
-			Status:  string(request.Status),
-			Error:   request.Error,
+			Module:    request.ModuleName,
+			Payload:   request.Payload,
+			CreatedAt: request.CreatedAt,
+			Status:    string(request.Status),
+			Error:     request.Error,
 		},
 		Relationships: resources.RequestRelationships{
 			User: resources.Relation{

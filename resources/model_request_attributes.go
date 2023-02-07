@@ -11,6 +11,8 @@ type RequestAttributes struct {
 	Module string `json:"module"`
 	// Already built payload to grant permission
 	Payload json.RawMessage `json:"payload"`
+	// timestamp when request was created
+	CreatedAt string `json:"created_at"`
 	// Error during request processing
 	Error *string `json:"error,omitempty"`
 	// Status of the request

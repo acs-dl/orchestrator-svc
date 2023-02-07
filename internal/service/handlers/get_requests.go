@@ -37,7 +37,7 @@ func GetRequests(w http.ResponseWriter, r *http.Request) {
 }
 
 func newRequestArrayResponse(requests []data.Request) resources.RequestListResponse {
-	var result []resources.Request
+	result := make([]resources.Request, 0)
 
 	for _, request := range requests {
 		result = append(result, newRequest(request))

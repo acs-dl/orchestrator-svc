@@ -7,6 +7,8 @@ package resources
 import "encoding/json"
 
 type GetRequest struct {
+	// timestamp when request was created
+	CreatedAt string `json:"created_at"`
 	// Error during request processing
 	Error *string `json:"error,omitempty"`
 	// Module to grant permission

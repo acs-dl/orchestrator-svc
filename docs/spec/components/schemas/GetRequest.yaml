@@ -3,6 +3,7 @@ required:
   - module
   - payload
   - status
+  - created_at
 properties:
   module:
     type: string
@@ -24,3 +25,6 @@ properties:
   error:
     type: string
     description: Error during request processing
+  created_at:
+    type: string
+    description: timestamp when request was created
