@@ -1,4 +1,4 @@
-name: id
+name: fromUserId
 in: path
 description: The identity id of the user from who was action
 required: true

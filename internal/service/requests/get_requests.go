@@ -1,13 +1,17 @@
 package requests
 
 import (
+	"gitlab.com/distributed_lab/kit/pgdb"
 	"gitlab.com/distributed_lab/urlval"
 	"net/http"
 )
 
 type GetRequestsRequest struct {
-	FromUserId *int64 `filter:"fromUserId"`
-	ToUserId   *int64 `filter:"toUserId"`
+	pgdb.OffsetPageParams
+
+	FromUserId *int64  `filter:"fromUserId"`
+	ToUserId   *int64  `filter:"toUserId"`
+	Status     *string `filter:"status"`
 }
 
 func NewGetRequestsRequest(r *http.Request) (GetRequestsRequest, error) {

@@ -23,8 +23,9 @@ func NewCreateRequestRequest(r *http.Request) (CreateRequestRequest, error) {
 
 func (r *CreateRequestRequest) validate() error {
 	return validation.Errors{
-		"module":  validation.Validate(&r.Data.Attributes.Module, validation.Required),
-		"payload": validation.Validate(&r.Data.Attributes.Payload, validation.Required),
-		"user_id": validation.Validate(&r.Data.Relationships.User.Data.ID, validation.Required),
+		"module":    validation.Validate(&r.Data.Attributes.Module, validation.Required),
+		"payload":   validation.Validate(&r.Data.Attributes.Payload, validation.Required),
+		"from_user": validation.Validate(&r.Data.Attributes.FromUser, validation.Required),
+		"to_user":   validation.Validate(&r.Data.Attributes.ToUser, validation.Required),
 	}.Filter()
 }

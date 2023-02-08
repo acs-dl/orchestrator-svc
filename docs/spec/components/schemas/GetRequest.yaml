@@ -4,6 +4,8 @@ required:
   - payload
   - status
   - created_at
+  - from_user
+  - to_user
 properties:
   module:
     type: string
@@ -28,3 +30,11 @@ properties:
   created_at:
     type: string
     description: timestamp when request was created
+  from_user:
+    type: string
+    description: user's id who send request
+    example: "1"
+  to_user:
+    type: string
+    description: user's id for who request was sent
+    example: "2"

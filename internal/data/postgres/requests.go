@@ -102,3 +102,23 @@ func (r requestsQ) FilterByToIds(ids ...int64) data.RequestQ {
 	r.updateBuilder = r.updateBuilder.Where(stmt)
 	return r
 }
+
+func (r requestsQ) Count() data.RequestQ {
+	r.selectBuilder = sq.Select("COUNT (*)").From(requestsTable)
+
+	return r
+}
+
+func (r requestsQ) GetTotalCount() (int64, error) {
+	var count int64
+
+	err := r.db.Get(&count, r.selectBuilder)
+
+	return count, err
+}
+
+func (r requestsQ) Page(pageParams pgdb.OffsetPageParams) data.RequestQ {
+	r.selectBuilder = pageParams.ApplyTo(r.selectBuilder, "id")
+
+	return r
+}

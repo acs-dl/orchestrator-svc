@@ -29,6 +29,7 @@ get:
   parameters:
     - $ref: '#/components/parameters/fromUserIdParam'
     - $ref: '#/components/parameters/toUserIdParam'
+    - $ref: '#/components/parameters/statusParam'
   responses:
     '200':
       description: Success
@@ -42,3 +43,10 @@ get:
                 items:
                   type: object
                   $ref: '#/components/schemas/Request'
+              meta:
+                type: object
+                properties:
+                  total_count:
+                    type: integer
+                    format: int64
+                    description: Total number of requests

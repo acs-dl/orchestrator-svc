@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"github.com/google/uuid"
 	"gitlab.com/distributed_lab/acs/orchestrator/internal/data"
 	"gitlab.com/distributed_lab/acs/orchestrator/internal/service/helpers"
@@ -20,17 +21,23 @@ func CreateRequest(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	toUserId, err := strconv.ParseInt(request.Data.Relationships.User.Data.ID, 10, 64)
+	fromUserId, err := strconv.ParseInt(request.Data.Attributes.FromUser, 10, 64)
 	if err != nil {
-		helpers.Log(r).WithError(err).Error("failed to parse user id")
+		helpers.Log(r).WithError(err).Errorf("failed to parse from user id `%s`", request.Data.Attributes.FromUser)
+		ape.RenderErr(w, problems.BadRequest(err)...)
+		return
+	}
+
+	toUserId, err := strconv.ParseInt(request.Data.Attributes.ToUser, 10, 64)
+	if err != nil {
+		helpers.Log(r).WithError(err).Errorf("failed to parse to user id `%s`", request.Data.Attributes.ToUser)
 		ape.RenderErr(w, problems.BadRequest(err)...)
 		return
 	}
 
 	requestData := data.Request{
-		ID: uuid.New().String(),
-		// TODO: add from user id
-		FromUserID: 12345,
+		ID:         uuid.New().String(),
+		FromUserID: fromUserId,
 		ToUserID:   toUserId,
 		Payload:    request.Data.Attributes.Payload,
 		ModuleName: request.Data.Attributes.Module,
@@ -49,7 +56,6 @@ func CreateRequest(w http.ResponseWriter, r *http.Request) {
 }
 
 func newRequest(request data.Request) resources.Request {
-	key := resources.NewKeyInt64(request.ToUserID, resources.USERS)
 	return resources.Request{
 		Key: resources.Key{
 			ID:   request.ID,
@@ -61,12 +67,10 @@ func newRequest(request data.Request) resources.Request {
 			CreatedAt: request.CreatedAt,
 			Status:    string(request.Status),
 			Error:     request.Error,
+			FromUser:  fmt.Sprintf("%d", request.FromUserID),
+			ToUser:    fmt.Sprintf("%d", request.ToUserID),
 		},
-		Relationships: resources.RequestRelationships{
-			User: resources.Relation{
-				Data: &key,
-			},
-		},
+		Relationships: resources.RequestRelationships{},
 	}
 }
 

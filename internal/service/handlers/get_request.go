@@ -1,10 +1,8 @@
 package handlers
 
 import (
-	"gitlab.com/distributed_lab/acs/orchestrator/internal/data"
 	"gitlab.com/distributed_lab/acs/orchestrator/internal/service/helpers"
 	"gitlab.com/distributed_lab/acs/orchestrator/internal/service/requests"
-	"gitlab.com/distributed_lab/acs/orchestrator/resources"
 	"gitlab.com/distributed_lab/ape"
 	"gitlab.com/distributed_lab/ape/problems"
 	"net/http"
@@ -30,21 +28,5 @@ func GetRequest(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ape.Render(w, newGetRequestResponse(*req))
-}
-
-func newGetRequestResponse(request data.Request) resources.Request {
-	return resources.Request{
-		Key: resources.Key{
-			ID:   request.ID,
-			Type: resources.REQUESTS,
-		},
-		Attributes: resources.RequestAttributes{
-			Module:  request.ModuleName,
-			Payload: request.Payload,
-			Status:  string(request.Status),
-			Error:   request.Error,
-		},
-		Relationships: resources.RequestRelationships{},
-	}
+	ape.Render(w, newRequestResponse(*req))
 }

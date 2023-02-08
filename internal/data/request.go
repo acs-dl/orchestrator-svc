@@ -1,6 +1,9 @@
 package data
 
-import "encoding/json"
+import (
+	"encoding/json"
+	"gitlab.com/distributed_lab/kit/pgdb"
+)
 
 type RequestStatus string
 
@@ -40,4 +43,9 @@ type RequestQ interface {
 
 	SetStatus(status RequestStatus) error
 	SetStatusError(status RequestStatus, errorMsg string) error
+
+	Count() RequestQ
+	GetTotalCount() (int64, error)
+
+	Page(pageParams pgdb.OffsetPageParams) RequestQ
 }

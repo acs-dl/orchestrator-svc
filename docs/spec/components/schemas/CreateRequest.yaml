@@ -2,6 +2,8 @@ type: object
 required:
   - module
   - payload
+  - from_user
+  - to_user
 properties:
   module:
     type: string
@@ -11,3 +13,11 @@ properties:
     type: object
     format: json.RawMessage
     description: Already built payload to grant permission
+  from_user:
+    type: string
+    description: user's id who send request
+    example: "1"
+  to_user:
+    type: string
+    description: user's id for who request was sent
+    example: "2"
