@@ -1,6 +1,7 @@
 package postgres
 
 import (
+	"database/sql"
 	sq "github.com/Masterminds/squirrel"
 	"github.com/fatih/structs"
 	"github.com/pkg/errors"
@@ -35,10 +36,11 @@ func (m modulesQ) FilterByNames(names ...string) data.ModuleQ {
 func (m modulesQ) Get() (*data.Module, error) {
 	var result data.Module
 	err := m.db.Get(&result, m.selectBuilder)
-	if err != nil {
-		return nil, err
+	if err == sql.ErrNoRows {
+		return nil, nil
 	}
-	return &result, nil
+
+	return &result, err
 }
 
 func (m modulesQ) Select() ([]data.Module, error) {

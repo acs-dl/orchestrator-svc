@@ -55,6 +55,10 @@ func (s *Sender) processMessages(ctx context.Context) error {
 			return errors.Wrap(err, "failed to get full module for notification: "+message.ID)
 		}
 
+		if module == nil {
+			return errors.Errorf("no module was found for notification:" + message.ID)
+		}
+
 		err = s.publisher.Publish(*module.Endpoint, s.buildMessage(message))
 		if err != nil {
 			return errors.Wrap(err, "failed to process notification: "+message.ID)

@@ -10,5 +10,6 @@ type ResourceType string
 const (
 	MODULES  ResourceType = "modules"
 	REQUESTS ResourceType = "requests"
+	ROLE     ResourceType = "role"
 	USERS    ResourceType = "users"
 )

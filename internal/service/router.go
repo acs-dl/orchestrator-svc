@@ -36,6 +36,10 @@ func (s *service) router() chi.Router {
 			r.With(auth.Jwt(s.jwt.Secret, "orchestrator", []string{"read", "write"}...)).
 				Get("/", handlers.GetModules)
 		})
+
+		r.With(auth.Jwt(s.jwt.Secret, "orchestrator", []string{"read", "write"}...)).
+			Get("/role", handlers.GetRole)
+
 		r.Route("/requests", func(r chi.Router) {
 			r.With(auth.Jwt(s.jwt.Secret, "orchestrator", []string{"write"}...)).
 				Post("/", handlers.CreateRequest)
