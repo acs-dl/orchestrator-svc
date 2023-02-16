@@ -33,8 +33,8 @@ func GetUserById(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var result []resources.User
-	for _, module := range modules {
-		returned, err := makeRequest(*module.Link, request.Id)
+	for i, module := range modules {
+		returned, err := makeRequest(*module.Link, request.Id, int64(i))
 		if err != nil {
 			helpers.Log(r).WithError(err).Errorf("failed to get user with id `%s` from module `%s`", request.Id, module.Name)
 			ape.RenderErr(w, problems.InternalError())
@@ -49,7 +49,7 @@ func GetUserById(w http.ResponseWriter, r *http.Request) {
 	ape.Render(w, newGetUserResponse(result))
 }
 
-func makeRequest(moduleLink, userId string) (*resources.User, error) {
+func makeRequest(moduleLink, userId string, counter int64) (*resources.User, error) {
 	link := fmt.Sprintf(moduleLink+"/users/%s", userId)
 	req, err := http.NewRequest(http.MethodGet, link, nil)
 	if err != nil {
@@ -86,7 +86,7 @@ func makeRequest(moduleLink, userId string) (*resources.User, error) {
 	}
 
 	return &resources.User{
-		Key: resources.NewKeyInt64(returned.Data.Attributes.UserId, resources.USERS),
+		Key: resources.NewKeyInt64(counter, resources.USERS),
 		Attributes: resources.UserAttributes{
 			Module:   returned.Data.Attributes.Module,
 			UserId:   returned.Data.Attributes.UserId,
