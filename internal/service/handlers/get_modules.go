@@ -13,7 +13,7 @@ func GetModules(w http.ResponseWriter, r *http.Request) {
 func newGetModulesResponse() resources.ModuleIconListResponse {
 	var moduleIcon = map[string]string{
 		"gitlab": "https://gist.githack.com/mhrynenko/422743c0c88341f79542a4e381d239f5/raw/13b466475d9096da01f3958f956457b6a4a30498/GitLab_logo.svg",
-		//"github":          "https://gist.githack.com/mhrynenko/422743c0c88341f79542a4e381d239f5/raw/13b466475d9096da01f3958f956457b6a4a30498/GitHub_logo.svg",
+		"github": "https://gist.githack.com/mhrynenko/422743c0c88341f79542a4e381d239f5/raw/13b466475d9096da01f3958f956457b6a4a30498/GitHub_logo.svg",
 		//"telegram":        "https://gist.githack.com/mhrynenko/bc7966e91e28ac17dbe809503855e60a/raw/fdbaf990e1f1a1fdc84712af801413b34a709959/Telegram_logo.svg",
 		//"docker":          "https://gist.githack.com/mhrynenko/422743c0c88341f79542a4e381d239f5/raw/13b466475d9096da01f3958f956457b6a4a30498/DockerHub_logo.svg",
 		//"click_up":        "https://gist.githack.com/mhrynenko/422743c0c88341f79542a4e381d239f5/raw/13b466475d9096da01f3958f956457b6a4a30498/ClickUp_logo.svg",
