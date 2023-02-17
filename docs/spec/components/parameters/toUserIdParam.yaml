@@ -3,5 +3,6 @@ in: path
 description: The identity id of the user to who was action
 required: true
 schema:
-  type: int
+  type: integer
+  format: int64
   example: 111
