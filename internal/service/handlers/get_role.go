@@ -39,7 +39,7 @@ func GetRole(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	roleResponse, err := makeGetRoleRequest(*module.Link, *request.AccessLevel)
+	roleResponse, err := makeGetRoleRequest(module.Link, *request.AccessLevel)
 	if err != nil {
 		helpers.Log(r).WithError(err).Infof("failed to get role `%s` from module `%s`", *request.AccessLevel, *request.ModuleName)
 		ape.RenderErr(w, problems.InternalError())

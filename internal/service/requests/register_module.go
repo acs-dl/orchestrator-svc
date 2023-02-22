@@ -23,8 +23,10 @@ func NewRegisterModuleRequest(r *http.Request) (RegisterModuleRequest, error) {
 
 func (r *RegisterModuleRequest) validate() error {
 	return validation.Errors{
-		"name":     validation.Validate(&r.Data.Attributes.Name, validation.Required),
-		"endpoint": validation.Validate(&r.Data.Attributes.Endpoint, validation.Required),
-		"link":     validation.Validate(&r.Data.Attributes.Link, validation.Required),
+		"name":   validation.Validate(&r.Data.Attributes.Name, validation.Required),
+		"topic":  validation.Validate(&r.Data.Attributes.Topic, validation.Required),
+		"link":   validation.Validate(&r.Data.Attributes.Link, validation.Required),
+		"prefix": validation.Validate(&r.Data.Attributes.Prefix, validation.Required),
+		"title":  validation.Validate(&r.Data.Attributes.Title, validation.Required),
 	}.Filter()
 }

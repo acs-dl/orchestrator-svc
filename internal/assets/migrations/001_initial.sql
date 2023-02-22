@@ -4,7 +4,9 @@ CREATE TYPE request_status_enum AS ENUM ('created', 'pending', 'finished', 'fail
 
 CREATE TABLE IF NOT EXISTS modules (
     name TEXT PRIMARY KEY,
-    endpoint TEXT NOT NULL,
+    title TEXT NOT NULL,
+    topic TEXT NOT NULL,
+    prefix TEXT NOT NULL,
     link TEXT NOT NULL
 );
 

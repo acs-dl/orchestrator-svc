@@ -9,6 +9,7 @@ allOf:
         required:
           - name
           - icon
+          - prefix
         properties:
           name:
             type: string
@@ -18,3 +19,7 @@ allOf:
             type: string
             description: Module icon url
             example: "https://traefik/gitlab"
+          prefix:
+            type: string
+            description: Module prefix to use in FE
+            example: "+"

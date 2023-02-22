@@ -51,7 +51,7 @@ func (r *Receiver) listenMessages(ctx context.Context) error {
 
 	for _, module := range modules {
 		r.log.Debug("started listening messages for module ", module.Name)
-		r.startSubscriber(ctx, *module.Endpoint)
+		r.startSubscriber(ctx, module.Topic)
 	}
 	return nil
 }
