@@ -22,8 +22,11 @@ CREATE TABLE IF NOT EXISTS requests (
     CONSTRAINT fk_modules_name FOREIGN KEY (module_name) REFERENCES modules (name) ON DELETE CASCADE
 );
 
+CREATE INDEX requests_payloadAction_ids ON requests ((payload ->> 'action'));
+
 -- +migrate Down
 
 DROP TABLE IF EXISTS requests;
 DROP TABLE IF EXISTS modules;
 DROP TYPE IF EXISTS request_status_enum;
+DROP INDEX IF EXISTS requests_payloadAction_ids;

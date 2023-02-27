@@ -12,6 +12,7 @@ type GetRequestsRequest struct {
 	FromUserId *int64  `filter:"fromUserId"`
 	ToUserId   *int64  `filter:"toUserId"`
 	Status     *string `filter:"status"`
+	Action     *string `filter:"action"`
 }
 
 func NewGetRequestsRequest(r *http.Request) (GetRequestsRequest, error) {

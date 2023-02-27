@@ -32,6 +32,10 @@ func GetRequests(w http.ResponseWriter, r *http.Request) {
 		requestsQ = requestsQ.FilterByStatuses(data.RequestStatus(*request.Status))
 		countRequestsQ = countRequestsQ.FilterByStatuses(data.RequestStatus(*request.Status))
 	}
+	if request.Action != nil {
+		requestsQ = requestsQ.FilterByActions(*request.Action)
+		countRequestsQ = countRequestsQ.FilterByActions(*request.Action)
+	}
 
 	dbRequests, err := requestsQ.Page(request.OffsetPageParams).Select()
 	if err != nil {

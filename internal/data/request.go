@@ -33,6 +33,7 @@ type RequestQ interface {
 	FilterByStatuses(statuses ...RequestStatus) RequestQ
 	FilterByFromIds(ids ...int64) RequestQ
 	FilterByToIds(ids ...int64) RequestQ
+	FilterByActions(actions ...string) RequestQ
 	JoinsModule() RequestQ
 
 	Get() (*Request, error)

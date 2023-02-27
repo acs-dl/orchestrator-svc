@@ -103,6 +103,13 @@ func (r requestsQ) FilterByToIds(ids ...int64) data.RequestQ {
 	return r
 }
 
+func (r requestsQ) FilterByActions(actions ...string) data.RequestQ {
+	stmt := sq.Eq{requestsTable + ".payload->>'action'": actions}
+	r.selectBuilder = r.selectBuilder.Where(stmt)
+	r.updateBuilder = r.updateBuilder.Where(stmt)
+	return r
+}
+
 func (r requestsQ) Count() data.RequestQ {
 	r.selectBuilder = sq.Select("COUNT (*)").From(requestsTable)
 
