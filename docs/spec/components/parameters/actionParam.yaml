@@ -3,5 +3,7 @@ in: path
 description: The action of request
 required: false
 schema:
-  type: string
-  example: "verify_user"
+  type: array
+  items:
+    type: string
+    example: "verify_user"
