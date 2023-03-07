@@ -63,7 +63,7 @@ func makeGetRolesRequest(moduleLink string) (*ModuleRolesResponse, error) {
 	if err := json.NewDecoder(res.Body).Decode(&returned); err != nil {
 		return nil, errors.Wrap(err, " failed to unmarshal body")
 	}
-	fmt.Println(returned)
+
 	return &returned, nil
 }
 
