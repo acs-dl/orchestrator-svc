@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"fmt"
 	"gitlab.com/distributed_lab/acs/orchestrator/internal/data"
 	"gitlab.com/distributed_lab/acs/orchestrator/internal/service/helpers"
 	"gitlab.com/distributed_lab/acs/orchestrator/internal/service/requests"
@@ -36,7 +35,6 @@ func GetRequests(w http.ResponseWriter, r *http.Request) {
 	}
 	if request.Action != nil {
 		actions := strings.Split(*request.Action, " ")
-		fmt.Println(actions)
 		requestsQ = requestsQ.FilterNotByActions(actions...)
 		countRequestsQ = countRequestsQ.FilterNotByActions(actions...)
 	}
