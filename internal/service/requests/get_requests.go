@@ -9,10 +9,10 @@ import (
 type GetRequestsRequest struct {
 	pgdb.OffsetPageParams
 
-	FromUserId *int64   `filter:"fromUserId"`
-	ToUserId   *int64   `filter:"toUserId"`
-	Status     *string  `filter:"status"`
-	Action     []string `filter:"action"`
+	FromUserId *int64  `filter:"fromUserId"`
+	ToUserId   *int64  `filter:"toUserId"`
+	Status     *string `filter:"status"`
+	Action     *string `filter:"action"`
 }
 
 func NewGetRequestsRequest(r *http.Request) (GetRequestsRequest, error) {

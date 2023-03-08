@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"gitlab.com/distributed_lab/acs/orchestrator/internal/data"
 	"gitlab.com/distributed_lab/acs/orchestrator/internal/service/helpers"
 	"gitlab.com/distributed_lab/acs/orchestrator/internal/service/requests"
@@ -8,6 +9,7 @@ import (
 	"gitlab.com/distributed_lab/ape"
 	"gitlab.com/distributed_lab/ape/problems"
 	"net/http"
+	"strings"
 )
 
 func GetRequests(w http.ResponseWriter, r *http.Request) {
@@ -32,9 +34,11 @@ func GetRequests(w http.ResponseWriter, r *http.Request) {
 		requestsQ = requestsQ.FilterByStatuses(data.RequestStatus(*request.Status))
 		countRequestsQ = countRequestsQ.FilterByStatuses(data.RequestStatus(*request.Status))
 	}
-	if len(request.Action) != 0 {
-		requestsQ = requestsQ.FilterNotByActions(request.Action...)
-		countRequestsQ = countRequestsQ.FilterNotByActions(request.Action...)
+	if request.Action != nil {
+		actions := strings.Split(*request.Action, " ")
+		fmt.Println(actions)
+		requestsQ = requestsQ.FilterNotByActions(actions...)
+		countRequestsQ = countRequestsQ.FilterNotByActions(actions...)
 	}
 
 	dbRequests, err := requestsQ.Page(request.OffsetPageParams).Select()
