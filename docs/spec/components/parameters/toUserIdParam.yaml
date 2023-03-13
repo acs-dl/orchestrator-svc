@@ -1,4 +1,4 @@
-name: toUserId
+name: 'filter[toUserId]'
 in: path
 description: The identity id of the user to who was action
 required: false

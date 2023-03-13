@@ -1,4 +1,4 @@
-name: status
+name: 'filter[status]'
 in: path
 description: The status of request
 required: false
