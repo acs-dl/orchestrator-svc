@@ -141,7 +141,7 @@ github.com/spf13/viper
 # github.com/subosito/gotenv v1.2.0
 ## explicit
 github.com/subosito/gotenv
-# gitlab.com/distributed_lab/acs/auth v0.0.0-20230202160032-c779e38da077
+# gitlab.com/distributed_lab/acs/auth v0.0.0-20230309115252-2c1f9e1d211a
 ## explicit; go 1.19
 gitlab.com/distributed_lab/acs/auth/internal/data
 gitlab.com/distributed_lab/acs/auth/internal/service/helpers
