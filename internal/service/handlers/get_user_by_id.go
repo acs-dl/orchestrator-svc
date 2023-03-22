@@ -3,13 +3,14 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
+	"net/http"
+
 	"gitlab.com/distributed_lab/acs/orchestrator/internal/service/helpers"
 	"gitlab.com/distributed_lab/acs/orchestrator/internal/service/requests"
 	"gitlab.com/distributed_lab/acs/orchestrator/resources"
 	"gitlab.com/distributed_lab/ape"
 	"gitlab.com/distributed_lab/ape/problems"
 	"gitlab.com/distributed_lab/logan/v3/errors"
-	"net/http"
 )
 
 func GetUserById(w http.ResponseWriter, r *http.Request) {
@@ -20,7 +21,7 @@ func GetUserById(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	modules, err := helpers.ModulesQ(r).Select()
+	modules, err := helpers.ModulesQ(r).FilterByIsModule(true).Select()
 	if err != nil {
 		helpers.Log(r).WithError(err).Error("failed to select modules")
 		ape.RenderErr(w, problems.InternalError())

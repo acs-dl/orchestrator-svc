@@ -1,17 +1,19 @@
 package data
 
 type Module struct {
-	Topic  string `json:"topic" structs:"topic"`
-	Link   string `json:"link" structs:"link"`
-	Name   string `json:"name" structs:"name"`
-	Title  string `json:"title" structs:"title"`
-	Prefix string `json:"prefix" structs:"prefix"`
+	Topic    string `json:"topic" structs:"topic"`
+	Link     string `json:"link" structs:"link"`
+	Name     string `json:"name" structs:"name"`
+	Title    string `json:"title" structs:"title"`
+	Prefix   string `json:"prefix" structs:"prefix"`
+	IsModule bool   `json:"is_module" structs:"is_module"`
 }
 
 type ModuleQ interface {
 	New() ModuleQ
 
 	FilterByNames(names ...string) ModuleQ
+	FilterByIsModule(isModule bool) ModuleQ
 
 	Get() (*Module, error)
 	Select() ([]Module, error)

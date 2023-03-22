@@ -14,7 +14,7 @@ import (
 )
 
 func GetRoles(w http.ResponseWriter, r *http.Request) {
-	modules, err := helpers.ModulesQ(r).Select()
+	modules, err := helpers.ModulesQ(r).FilterByIsModule(true).Select()
 	if err != nil {
 		helpers.Log(r).WithError(err).Errorf("failed to select modules")
 		ape.RenderErr(w, problems.InternalError())

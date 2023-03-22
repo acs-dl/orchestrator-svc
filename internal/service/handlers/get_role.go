@@ -3,13 +3,14 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
+	"net/http"
+
 	"gitlab.com/distributed_lab/acs/orchestrator/internal/service/helpers"
 	"gitlab.com/distributed_lab/acs/orchestrator/internal/service/requests"
 	"gitlab.com/distributed_lab/acs/orchestrator/resources"
 	"gitlab.com/distributed_lab/ape"
 	"gitlab.com/distributed_lab/ape/problems"
 	"gitlab.com/distributed_lab/logan/v3/errors"
-	"net/http"
 )
 
 func GetRole(w http.ResponseWriter, r *http.Request) {
@@ -26,7 +27,7 @@ func GetRole(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	module, err := helpers.ModulesQ(r).FilterByNames(*request.ModuleName).Get()
+	module, err := helpers.ModulesQ(r).FilterByNames(*request.ModuleName).FilterByIsModule(true).Get()
 	if err != nil {
 		helpers.Log(r).WithError(err).Infof("failed to get module `%s`", *request.ModuleName)
 		ape.RenderErr(w, problems.InternalError())

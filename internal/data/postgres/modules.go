@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"database/sql"
+
 	sq "github.com/Masterminds/squirrel"
 	"github.com/fatih/structs"
 	"github.com/pkg/errors"
@@ -29,6 +30,12 @@ func (m modulesQ) New() data.ModuleQ {
 
 func (m modulesQ) FilterByNames(names ...string) data.ModuleQ {
 	stmt := sq.Eq{modulesTable + ".name": names}
+	m.selectBuilder = m.selectBuilder.Where(stmt)
+	return m
+}
+
+func (m modulesQ) FilterByIsModule(isModule bool) data.ModuleQ {
+	stmt := sq.Eq{modulesTable + ".is_module": isModule}
 	m.selectBuilder = m.selectBuilder.Where(stmt)
 	return m
 }
