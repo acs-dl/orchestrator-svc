@@ -26,6 +26,7 @@ func (s *service) router() chi.Router {
 			helpers.CtxLog(s.log),
 			helpers.CtxModulesQ(s.modulesQ),
 			helpers.CtxRequestsQ(s.requestsQ),
+			helpers.CtxSender(sender.NewSender(s.publisher, s.requestsQ, s.modulesQ)),
 		),
 	)
 
@@ -63,7 +64,8 @@ func (s *service) router() chi.Router {
 
 func (s *service) startListener(ctx context.Context) error {
 	s.log.Info("Starting listener")
-	receiver.NewReceiver(s.subscriber, s.modulesQ, s.requestsQ).Run(ctx)
+
+	receiver.NewReceiver(s.subscriber, s.modulesQ, s.requestsQ, sender.NewSender(s.publisher, s.requestsQ, s.modulesQ)).Run(ctx)
 	return nil
 }
 

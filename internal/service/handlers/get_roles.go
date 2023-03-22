@@ -3,12 +3,14 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
+	"net/http"
+
+	"gitlab.com/distributed_lab/acs/orchestrator/internal/data"
 	"gitlab.com/distributed_lab/acs/orchestrator/internal/service/helpers"
 	"gitlab.com/distributed_lab/acs/orchestrator/resources"
 	"gitlab.com/distributed_lab/ape"
 	"gitlab.com/distributed_lab/ape/problems"
 	"gitlab.com/distributed_lab/logan/v3/errors"
-	"net/http"
 )
 
 func GetRoles(w http.ResponseWriter, r *http.Request) {
@@ -28,7 +30,7 @@ func GetRoles(w http.ResponseWriter, r *http.Request) {
 	}
 
 	for _, module := range modules {
-		moduleRoles, err := makeGetRolesRequest(module.Link)
+		moduleRoles, err := MakeGetRolesRequest(module.Link, "/roles")
 		if err != nil {
 			helpers.Log(r).WithError(err).Infof("failed to get roles from module `%s`", module.Name)
 			ape.RenderErr(w, problems.InternalError())
@@ -40,8 +42,9 @@ func GetRoles(w http.ResponseWriter, r *http.Request) {
 	ape.Render(w, response)
 }
 
-func makeGetRolesRequest(moduleLink string) (*ModuleRolesResponse, error) {
-	link := fmt.Sprintf(moduleLink + "/roles")
+func MakeGetRolesRequest(moduleLink, endpoint string) (*data.ModuleRolesResponse, error) {
+	link := fmt.Sprintf(moduleLink + endpoint)
+
 	req, err := http.NewRequest(http.MethodGet, link, nil)
 	if err != nil {
 		return nil, errors.Wrap(err, "couldn't create request")
@@ -58,7 +61,7 @@ func makeGetRolesRequest(moduleLink string) (*ModuleRolesResponse, error) {
 		return nil, errors.New(fmt.Sprintf("error in response, status %s", res.Status))
 	}
 
-	var returned ModuleRolesResponse
+	var returned data.ModuleRolesResponse
 
 	if err := json.NewDecoder(res.Body).Decode(&returned); err != nil {
 		return nil, errors.Wrap(err, " failed to unmarshal body")
@@ -67,35 +70,14 @@ func makeGetRolesRequest(moduleLink string) (*ModuleRolesResponse, error) {
 	return &returned, nil
 }
 
-func newModulesRolesResponse() ModulesRolesResponse {
-	return ModulesRolesResponse{
-		Data: ModulesRoles{
+func newModulesRolesResponse() data.ModulesRolesResponse {
+	return data.ModulesRolesResponse{
+		Data: data.ModulesRoles{
 			Key: resources.Key{
 				ID:   "0",
 				Type: resources.MODULES,
 			},
-			Attributes: Modules{},
+			Attributes: data.Modules{},
 		},
 	}
-}
-
-type ModulesRolesResponse struct {
-	Data ModulesRoles `json:"data"`
-}
-
-type ModulesRoles struct {
-	resources.Key
-	Attributes Modules `json:"attributes"`
-}
-
-type Modules map[string]Roles
-
-type Roles map[string]string
-type ModuleRoles struct {
-	resources.Key
-	Attributes Roles `json:"attributes"`
-}
-
-type ModuleRolesResponse struct {
-	Data ModuleRoles `json:"data"`
 }
