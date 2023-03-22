@@ -1,12 +1,12 @@
 package data
 
 type Module struct {
-	Topic    string `json:"topic" structs:"topic"`
-	Link     string `json:"link" structs:"link"`
-	Name     string `json:"name" structs:"name"`
-	Title    string `json:"title" structs:"title"`
-	Prefix   string `json:"prefix" structs:"prefix"`
-	IsModule bool   `json:"is_module" structs:"is_module"`
+	Topic    string `json:"topic" structs:"topic" db:"topic"`
+	Link     string `json:"link" structs:"link" db:"link"`
+	Name     string `json:"name" structs:"name" db:"name"`
+	Title    string `json:"title" structs:"title" db:"title"`
+	Prefix   string `json:"prefix" structs:"prefix" db:"prefix"`
+	IsModule bool   `json:"is_module" structs:"is_module" db:"is_module"`
 }
 
 type ModuleQ interface {
