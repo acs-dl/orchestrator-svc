@@ -31,6 +31,10 @@ func (s *service) router() chi.Router {
 	)
 
 	r.Route("/integrations/orchestrator", func(r chi.Router) {
+		r.Route("/health", func(r chi.Router) {
+			r.Get("/", handlers.CheckHealth)
+		})
+
 		r.Route("/modules", func(r chi.Router) {
 			r.Post("/", handlers.RegisterModule)           // comes from modules
 			r.Delete("/{name}", handlers.UnregisterModule) // comes from modules
