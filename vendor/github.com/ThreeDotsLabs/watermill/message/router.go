@@ -46,15 +46,16 @@ var PassthroughHandler HandlerFunc = func(msg *Message) ([]*Message, error) {
 // It can be attached to the router by using `AddMiddleware` method.
 //
 // Example:
-//		func ExampleMiddleware(h message.HandlerFunc) message.HandlerFunc {
-//			return func(message *message.Message) ([]*message.Message, error) {
-//				fmt.Println("executed before handler")
-//				producedMessages, err := h(message)
-//				fmt.Println("executed after handler")
 //
-//				return producedMessages, err
-//			}
+//	func ExampleMiddleware(h message.HandlerFunc) message.HandlerFunc {
+//		return func(message *message.Message) ([]*message.Message, error) {
+//			fmt.Println("executed before handler")
+//			producedMessages, err := h(message)
+//			fmt.Println("executed after handler")
+//
+//			return producedMessages, err
 //		}
+//	}
 type HandlerMiddleware func(h HandlerFunc) HandlerFunc
 
 // RouterPlugin is function which is executed on Router start.
@@ -66,6 +67,7 @@ type PublisherDecorator func(pub Publisher) (Publisher, error)
 // SubscriberDecorator wraps the underlying Subscriber, adding some functionality.
 type SubscriberDecorator func(sub Subscriber) (Subscriber, error)
 
+// RouterConfig holds the Router's configuration options.
 type RouterConfig struct {
 	// CloseTimeout determines how long router should work for handlers when closing.
 	CloseTimeout time.Duration
@@ -77,10 +79,12 @@ func (c *RouterConfig) setDefaults() {
 	}
 }
 
+// Validate returns Router configuration error, if any.
 func (c RouterConfig) Validate() error {
 	return nil
 }
 
+// NewRouter creates a new Router with given configuration.
 func NewRouter(config RouterConfig, logger watermill.LoggerAdapter) (*Router, error) {
 	config.setDefaults()
 	if err := config.Validate(); err != nil {
@@ -92,11 +96,17 @@ func NewRouter(config RouterConfig, logger watermill.LoggerAdapter) (*Router, er
 
 		handlers: map[string]*handler{},
 
-		handlersWg:        &sync.WaitGroup{},
-		runningHandlersWg: &sync.WaitGroup{},
+		handlersWg: &sync.WaitGroup{},
 
-		closeCh:  make(chan struct{}),
-		closedCh: make(chan struct{}),
+		runningHandlersWg:     &sync.WaitGroup{},
+		runningHandlersWgLock: &sync.Mutex{},
+
+		handlerAdded: make(chan struct{}),
+
+		handlersLock: &sync.RWMutex{},
+
+		closingInProgressCh: make(chan struct{}),
+		closedCh:            make(chan struct{}),
 
 		logger: logger,
 
@@ -121,15 +131,20 @@ type Router struct {
 
 	plugins []RouterPlugin
 
-	handlers map[string]*handler
+	handlers     map[string]*handler
+	handlersLock *sync.RWMutex
 
-	handlersWg        *sync.WaitGroup
-	runningHandlersWg *sync.WaitGroup
+	handlersWg *sync.WaitGroup
 
-	closeCh    chan struct{}
-	closedCh   chan struct{}
-	closed     bool
-	closedLock sync.Mutex
+	runningHandlersWg     *sync.WaitGroup
+	runningHandlersWgLock *sync.Mutex
+
+	handlerAdded chan struct{}
+
+	closingInProgressCh chan struct{}
+	closedCh            chan struct{}
+	closed              bool
+	closedLock          sync.Mutex
 
 	logger watermill.LoggerAdapter
 
@@ -140,6 +155,7 @@ type Router struct {
 	running   chan struct{}
 }
 
+// Logger returns the Router's logger.
 func (r *Router) Logger() watermill.LoggerAdapter {
 	return r.logger
 }
@@ -201,6 +217,17 @@ func (r *Router) AddSubscriberDecorators(dec ...SubscriberDecorator) {
 	r.subscriberDecorators = append(r.subscriberDecorators, dec...)
 }
 
+// Handlers returns all registered handlers.
+func (r *Router) Handlers() map[string]HandlerFunc {
+	handlers := map[string]HandlerFunc{}
+
+	for handlerName, handler := range r.handlers {
+		handlers[handlerName] = handler.handlerFunc
+	}
+
+	return handlers
+}
+
 // DuplicateHandlerNameError is sent in a panic when you try to add a second handler with the same name.
 type DuplicateHandlerNameError struct {
 	HandlerName string
@@ -220,6 +247,8 @@ func (d DuplicateHandlerNameError) Error() string {
 // When handler needs to publish to multiple topics,
 // it is recommended to just inject Publisher to Handler or implement middleware
 // which will catch messages and publish to topic based on metadata for example.
+//
+// If handler is added while router is already running, you need to explicitly call RunHandlers().
 func (r *Router) AddHandler(
 	handlerName string,
 	subscribeTopic string,
@@ -232,6 +261,9 @@ func (r *Router) AddHandler(
 		"handler_name": handlerName,
 		"topic":        subscribeTopic,
 	})
+
+	r.handlersLock.Lock()
+	defer r.handlersLock.Unlock()
 
 	if _, ok := r.handlers[handlerName]; ok {
 		panic(DuplicateHandlerNameError{handlerName})
@@ -251,13 +283,25 @@ func (r *Router) AddHandler(
 		publishTopic:  publishTopic,
 		publisherName: publisherName,
 
-		handlerFunc:       handlerFunc,
-		runningHandlersWg: r.runningHandlersWg,
-		messagesCh:        nil,
-		closeCh:           r.closeCh,
+		handlerFunc: handlerFunc,
+
+		runningHandlersWg:     r.runningHandlersWg,
+		runningHandlersWgLock: r.runningHandlersWgLock,
+
+		messagesCh:     nil,
+		routersCloseCh: r.closingInProgressCh,
+
+		startedCh: make(chan struct{}),
 	}
 
+	r.handlersWg.Add(1)
 	r.handlers[handlerName] = newHandler
+
+	select {
+	case r.handlerAdded <- struct{}{}:
+	default:
+		// closeWhenAllHandlersStopped is not always waiting for handlerAdded
+	}
 
 	return &Handler{
 		router:  r,
@@ -274,6 +318,8 @@ func (r *Router) AddHandler(
 // subscribeTopic is a topic from which handler will receive messages.
 //
 // subscriber is Subscriber from which messages will be consumed.
+//
+// If handler is added while router is already running, you need to explicitly call RunHandlers().
 func (r *Router) AddNoPublisherHandler(
 	handlerName string,
 	subscribeTopic string,
@@ -313,51 +359,15 @@ func (r *Router) Run(ctx context.Context) (err error) {
 		}
 	}
 
-	r.logger.Debug("Applying decorators", nil)
-	for name, h := range r.handlers {
-		if err = r.decorateHandlerPublisher(h); err != nil {
-			return errors.Wrapf(err, "could not decorate publisher of handler %s", name)
-		}
-		if err = r.decorateHandlerSubscriber(h); err != nil {
-			return errors.Wrapf(err, "could not decorate subscriber of handler %s", name)
-		}
-	}
-
-	for _, h := range r.handlers {
-		r.logger.Debug("Subscribing to topic", watermill.LogFields{
-			"subscriber_name": h.name,
-			"topic":           h.subscribeTopic,
-		})
-
-		messages, err := h.subscriber.Subscribe(ctx, h.subscribeTopic)
-		if err != nil {
-			return errors.Wrapf(err, "cannot subscribe topic %s", h.subscribeTopic)
-		}
-
-		h.messagesCh = messages
-	}
-
-	for i := range r.handlers {
-		handler := r.handlers[i]
-
-		r.handlersWg.Add(1)
-
-		go func() {
-			handler.run(r.middlewares)
-
-			r.handlersWg.Done()
-			r.logger.Info("Subscriber stopped", watermill.LogFields{
-				"subscriber_name": handler.name,
-				"topic":           handler.subscribeTopic,
-			})
-		}()
+	if err := r.RunHandlers(ctx); err != nil {
+		return err
 	}
 
 	close(r.running)
 
 	go r.closeWhenAllHandlersStopped()
 
-	<-r.closeCh
+	<-r.closingInProgressCh
 	cancel()
 
 	r.logger.Info("Waiting for messages", watermill.LogFields{
@@ -371,9 +381,89 @@ func (r *Router) Run(ctx context.Context) (err error) {
 	return nil
 }
 
+// RunHandlers runs all handlers that were added after Run().
+// RunHandlers is idempotent, so can be called multiple times safely.
+func (r *Router) RunHandlers(ctx context.Context) error {
+	if !r.isRunning {
+		return errors.New("you can't call RunHandlers on non-running router")
+	}
+
+	r.handlersLock.Lock()
+	defer r.handlersLock.Unlock()
+
+	for name, h := range r.handlers {
+		name := name
+		h := h
+
+		if h.started {
+			continue
+		}
+
+		if err := r.decorateHandlerPublisher(h); err != nil {
+			return errors.Wrapf(err, "could not decorate publisher of handler %s", name)
+		}
+		if err := r.decorateHandlerSubscriber(h); err != nil {
+			return errors.Wrapf(err, "could not decorate subscriber of handler %s", name)
+		}
+
+		r.logger.Debug("Subscribing to topic", watermill.LogFields{
+			"subscriber_name": h.name,
+			"topic":           h.subscribeTopic,
+		})
+
+		ctx, cancel := context.WithCancel(ctx)
+
+		messages, err := h.subscriber.Subscribe(ctx, h.subscribeTopic)
+		if err != nil {
+			cancel()
+			return errors.Wrapf(err, "cannot subscribe topic %s", h.subscribeTopic)
+		}
+
+		h.messagesCh = messages
+		h.started = true
+		close(h.startedCh)
+
+		h.stopFn = cancel
+		h.stopped = make(chan struct{})
+
+		go func() {
+			defer cancel()
+
+			h.run(ctx, r.middlewares)
+
+			r.handlersWg.Done()
+			r.logger.Info("Subscriber stopped", watermill.LogFields{
+				"subscriber_name": h.name,
+				"topic":           h.subscribeTopic,
+			})
+
+			r.handlersLock.Lock()
+			delete(r.handlers, name)
+			r.handlersLock.Unlock()
+		}()
+	}
+	return nil
+}
+
 // closeWhenAllHandlersStopped closed router, when all handlers has stopped,
 // because for example all subscriptions are closed.
 func (r *Router) closeWhenAllHandlersStopped() {
+	r.handlersLock.RLock()
+	hasHandlers := len(r.handlers) == 0
+	r.handlersLock.RUnlock()
+
+	if hasHandlers {
+		// in that situation router will be closed immediately (even if they are no routers)
+		// let's wait for
+		select {
+		case <-r.handlerAdded:
+			// it should be some handler to track
+		case <-r.closedCh:
+			// let's avoid goroutine leak
+			return
+		}
+	}
+
 	r.handlersWg.Wait()
 	if r.isClosed() {
 		// already closed
@@ -389,18 +479,32 @@ func (r *Router) closeWhenAllHandlersStopped() {
 
 // Running is closed when router is running.
 // In other words: you can wait till router is running using
-//		fmt.Println("Starting router")
-//		go r.Run(ctx)
-//		<- r.Running()
-//		fmt.Println("Router is running")
+//
+//	fmt.Println("Starting router")
+//	go r.Run(ctx)
+//	<- r.Running()
+//	fmt.Println("Router is running")
 func (r *Router) Running() chan struct{} {
 	return r.running
+}
+
+// IsRunning returns true when router is running.
+func (r *Router) IsRunning() bool {
+	select {
+	case <-r.running:
+		return true
+	default:
+		return false
+	}
 }
 
 // Close gracefully closes the router with a timeout provided in the configuration.
 func (r *Router) Close() error {
 	r.closedLock.Lock()
 	defer r.closedLock.Unlock()
+
+	r.handlersLock.Lock()
+	defer r.handlersLock.Unlock()
 
 	if r.closed {
 		return nil
@@ -410,15 +514,34 @@ func (r *Router) Close() error {
 	r.logger.Info("Closing router", nil)
 	defer r.logger.Info("Router closed", nil)
 
-	close(r.closeCh)
+	close(r.closingInProgressCh)
 	defer close(r.closedCh)
 
-	timeouted := sync_internal.WaitGroupTimeout(r.handlersWg, r.config.CloseTimeout)
+	timeouted := r.waitForHandlers()
 	if timeouted {
-		return errors.New("router close timeouted")
+		return errors.New("router close timeout")
 	}
 
 	return nil
+}
+
+func (r *Router) waitForHandlers() bool {
+	var waitGroup sync.WaitGroup
+	waitGroup.Add(1)
+	go func() {
+		defer waitGroup.Done()
+		r.handlersWg.Wait()
+	}()
+	waitGroup.Add(1)
+	go func() {
+		defer waitGroup.Done()
+
+		r.runningHandlersWgLock.Lock()
+		defer r.runningHandlersWgLock.Unlock()
+
+		r.runningHandlersWg.Wait()
+	}()
+	return sync_internal.WaitGroupTimeout(&waitGroup, r.config.CloseTimeout)
 }
 
 func (r *Router) isClosed() bool {
@@ -442,14 +565,20 @@ type handler struct {
 
 	handlerFunc HandlerFunc
 
-	runningHandlersWg *sync.WaitGroup
+	runningHandlersWg     *sync.WaitGroup
+	runningHandlersWgLock *sync.Mutex
 
 	messagesCh <-chan *Message
 
-	closeCh chan struct{}
+	started   bool
+	startedCh chan struct{}
+
+	stopFn         context.CancelFunc
+	stopped        chan struct{}
+	routersCloseCh chan struct{}
 }
 
-func (h *handler) run(middlewares []middleware) {
+func (h *handler) run(ctx context.Context, middlewares []middleware) {
 	h.logger.Info("Starting handler", watermill.LogFields{
 		"subscriber_name": h.name,
 		"topic":           h.subscribeTopic,
@@ -465,10 +594,13 @@ func (h *handler) run(middlewares []middleware) {
 		}
 	}
 
-	go h.handleClose()
+	go h.handleClose(ctx)
 
 	for msg := range h.messagesCh {
+		h.runningHandlersWgLock.Lock()
 		h.runningHandlersWg.Add(1)
+		h.runningHandlersWgLock.Unlock()
+
 		go h.handleMessage(msg, middlewareHandler)
 	}
 
@@ -481,8 +613,10 @@ func (h *handler) run(middlewares []middleware) {
 	}
 
 	h.logger.Debug("Router handler stopped", nil)
+	close(h.stopped)
 }
 
+// Handler handles Messages.
 type Handler struct {
 	router  *Router
 	handler *handler
@@ -499,6 +633,27 @@ func (h *Handler) AddMiddleware(m ...HandlerMiddleware) {
 	})
 
 	h.router.addHandlerLevelMiddleware(handler.name, m...)
+}
+
+// Started returns channel which is stopped when handler is running.
+func (h *Handler) Started() chan struct{} {
+	return h.handler.startedCh
+}
+
+// Stop stops the handler.
+// Stop is asynchronous.
+// You can check if handler was stopped with Stopped() function.
+func (h *Handler) Stop() {
+	if !h.handler.started {
+		panic("handler is not started")
+	}
+
+	h.handler.stopFn()
+}
+
+// Stopped returns channel which is stopped when handler did stop.
+func (h *Handler) Stopped() chan struct{} {
+	return h.handler.stopped
 }
 
 // decorateHandlerPublisher applies the decorator chain to handler's publisher.
@@ -569,16 +724,19 @@ func (h *handler) addHandlerContext(messages ...*Message) {
 	}
 }
 
-func (h *handler) handleClose() {
-	<-h.closeCh
-
-	h.logger.Debug("Waiting for subscriber to close", nil)
-
-	if err := h.subscriber.Close(); err != nil {
-		h.logger.Error("Failed to close subscriber", err, nil)
+func (h *handler) handleClose(ctx context.Context) {
+	select {
+	case <-h.routersCloseCh:
+		// for backward compatibility we are closing subscriber
+		h.logger.Debug("Waiting for subscriber to close", nil)
+		if err := h.subscriber.Close(); err != nil {
+			h.logger.Error("Failed to close subscriber", err, nil)
+		}
+		h.logger.Debug("Subscriber closed", nil)
+	case <-ctx.Done():
+		// we are closing subscriber just when entire router is closed
 	}
-
-	h.logger.Debug("Subscriber closed", nil)
+	h.stopFn()
 }
 
 func (h *handler) handleMessage(msg *Message, handler HandlerFunc) {

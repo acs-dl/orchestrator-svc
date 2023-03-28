@@ -1,16 +1,17 @@
 package handlers
 
 import (
+	"net/http"
+
 	"gitlab.com/distributed_lab/acs/orchestrator/internal/data"
 	"gitlab.com/distributed_lab/acs/orchestrator/internal/service/helpers"
 	"gitlab.com/distributed_lab/acs/orchestrator/resources"
 	"gitlab.com/distributed_lab/ape"
 	"gitlab.com/distributed_lab/ape/problems"
-	"net/http"
 )
 
 func GetModules(w http.ResponseWriter, r *http.Request) {
-	modules, err := helpers.ModulesQ(r).Select()
+	modules, err := helpers.ModulesQ(r).FilterByIsModule(true).Select()
 	if err != nil {
 		helpers.Log(r).WithError(err).Error("failed to get modules")
 		ape.RenderErr(w, problems.InternalError())

@@ -27,12 +27,17 @@ func (s *service) router() chi.Router {
 			helpers.CtxModulesQ(s.modulesQ),
 			helpers.CtxRequestsQ(s.requestsQ),
 			helpers.CtxSender(sender.NewSender(s.publisher, s.requestsQ, s.modulesQ)),
+			helpers.CtxRawDB(s.rawDB),
+			helpers.CtxPublisher(s.publisher),
+			helpers.CtxSubscriber(s.subscriber),
 		),
 	)
 
 	r.Route("/integrations/orchestrator", func(r chi.Router) {
 		r.Route("/health", func(r chi.Router) {
-			r.Get("/", handlers.CheckHealth)
+			r.Get("/live", handlers.CheckHealthLive)
+			r.Get("/ready", handlers.CheckHealthReady)
+			r.Get("/status", handlers.CheckHealthStatus)
 		})
 
 		r.Route("/modules", func(r chi.Router) {

@@ -11,8 +11,10 @@ import (
 	"sync"
 )
 
+// LogFields is the logger's key-value list of fields.
 type LogFields map[string]interface{}
 
+// Add adds new fields to the list of LogFields.
 func (l LogFields) Add(newFields LogFields) LogFields {
 	resultFields := make(LogFields, len(l)+len(newFields))
 
@@ -26,6 +28,7 @@ func (l LogFields) Add(newFields LogFields) LogFields {
 	return resultFields
 }
 
+// Copy copies the LogFields.
 func (l LogFields) Copy() LogFields {
 	cpy := make(LogFields, len(l))
 	for k, v := range l {
@@ -54,7 +57,7 @@ func (NopLogger) Debug(msg string, fields LogFields)            {}
 func (NopLogger) Trace(msg string, fields LogFields)            {}
 func (l NopLogger) With(fields LogFields) LoggerAdapter         { return l }
 
-// StdLoggerAdapter is a logger implementation, which sends al logs to provided standard output.
+// StdLoggerAdapter is a logger implementation, which sends all logs to provided standard output.
 type StdLoggerAdapter struct {
 	ErrorLogger *log.Logger
 	InfoLogger  *log.Logger
@@ -64,7 +67,7 @@ type StdLoggerAdapter struct {
 	fields LogFields
 }
 
-// NewStdLogger creates StdLoggerAdapter which sends al logs to stderr.
+// NewStdLogger creates StdLoggerAdapter which sends all logs to stderr.
 func NewStdLogger(debug, trace bool) LoggerAdapter {
 	return NewStdLoggerWithOut(os.Stderr, debug, trace)
 }
@@ -145,7 +148,7 @@ func (l *StdLoggerAdapter) log(logger *log.Logger, level string, msg string, fie
 		fieldsStr += key + "=" + valueStr + " "
 	}
 
-	logger.Output(3, fmt.Sprintf("\t"+`level=%s msg="%s" %s`, level, msg, fieldsStr))
+	_ = logger.Output(3, fmt.Sprintf("\t"+`level=%s msg="%s" %s`, level, msg, fieldsStr))
 }
 
 type LogLevel uint
