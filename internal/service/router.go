@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+
 	"github.com/go-chi/chi"
 	auth "gitlab.com/distributed_lab/acs/auth/middlewares"
 	"gitlab.com/distributed_lab/acs/orchestrator/internal/receiver"

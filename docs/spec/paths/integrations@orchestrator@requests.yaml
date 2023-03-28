@@ -30,6 +30,7 @@ get:
     - $ref: '#/components/parameters/fromUserIdParam'
     - $ref: '#/components/parameters/toUserIdParam'
     - $ref: '#/components/parameters/statusParam'
+    - $ref: '#/components/parameters/actionParam'
   responses:
     '200':
       description: Success

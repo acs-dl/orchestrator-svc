@@ -1,0 +1,7 @@
+name: 'filter[action]'
+in: path
+description: The action of request, it's a string joined by space character " "
+required: false
+schema:
+  type: string
+  example: "verify_user add_user"
