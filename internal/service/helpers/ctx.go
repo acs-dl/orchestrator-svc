@@ -2,8 +2,10 @@ package helpers
 
 import (
 	"context"
-	"gitlab.com/distributed_lab/acs/orchestrator/internal/data"
 	"net/http"
+
+	"gitlab.com/distributed_lab/acs/orchestrator/internal/data"
+	"gitlab.com/distributed_lab/acs/orchestrator/internal/sender"
 
 	"gitlab.com/distributed_lab/logan/v3"
 )
@@ -14,6 +16,7 @@ const (
 	logCtxKey ctxKey = iota
 	modulesQCtxKey
 	requestsQCtxKey
+	senderCtxKey
 )
 
 func CtxLog(entry *logan.Entry) func(context.Context) context.Context {
@@ -44,4 +47,15 @@ func CtxRequestsQ(entry data.RequestQ) func(context.Context) context.Context {
 
 func RequestsQ(r *http.Request) data.RequestQ {
 	return r.Context().Value(requestsQCtxKey).(data.RequestQ)
+}
+
+func CtxSender(entry *sender.Sender) func(context.Context) context.Context {
+	return func(ctx context.Context) context.Context {
+		return context.WithValue(ctx, senderCtxKey, entry)
+	}
+
+}
+
+func Sender(r *http.Request) *sender.Sender {
+	return r.Context().Value(senderCtxKey).(*sender.Sender)
 }

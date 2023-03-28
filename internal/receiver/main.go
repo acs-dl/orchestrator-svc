@@ -4,14 +4,17 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"time"
+
 	"github.com/ThreeDotsLabs/watermill-amqp/v2/pkg/amqp"
 	"github.com/ThreeDotsLabs/watermill/message"
 	"gitlab.com/distributed_lab/acs/orchestrator/internal/data"
+	"gitlab.com/distributed_lab/acs/orchestrator/internal/processor"
+	"gitlab.com/distributed_lab/acs/orchestrator/internal/sender"
 	"gitlab.com/distributed_lab/acs/orchestrator/internal/types"
 	"gitlab.com/distributed_lab/logan/v3"
 	"gitlab.com/distributed_lab/logan/v3/errors"
 	"gitlab.com/distributed_lab/running"
-	"time"
 )
 
 const serviceName = "receiver"
@@ -21,14 +24,16 @@ type Receiver struct {
 	log        *logan.Entry
 	modulesQ   data.ModuleQ
 	requestsQ  data.RequestQ
+	processor  processor.Processor
 }
 
-func NewReceiver(subscriber *amqp.Subscriber, modulesQ data.ModuleQ, requestsQ data.RequestQ) *Receiver {
+func NewReceiver(subscriber *amqp.Subscriber, modulesQ data.ModuleQ, requestsQ data.RequestQ, sender *sender.Sender) *Receiver {
 	return &Receiver{
 		subscriber: subscriber,
 		log:        logan.New().WithField("service", serviceName),
 		modulesQ:   modulesQ,
 		requestsQ:  requestsQ,
+		processor:  processor.NewProcessor(modulesQ, sender),
 	}
 }
 
@@ -97,6 +102,15 @@ func (r *Receiver) processMessage(msg *message.Message) error {
 	err := json.Unmarshal(msg.Payload, &queueOutput)
 	if err != nil {
 		return errors.Wrap(err, "failed to unmarshal message "+msg.UUID)
+	}
+
+	if queueOutput.Action != nil {
+		err = r.processor.HandleNewMessage(queueOutput)
+		if err != nil {
+			return errors.Wrap(err, "failed to handle message")
+		}
+
+		return nil
 	}
 
 	err = r.requestsQ.FilterByIDs(queueOutput.ID).SetStatusError(queueOutput.Status.ToRequestStatus(), queueOutput.Error)
