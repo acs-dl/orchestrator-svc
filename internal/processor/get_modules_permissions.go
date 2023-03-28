@@ -10,6 +10,8 @@ import (
 )
 
 func (p *processor) handleGetModulesPermissions(msg types.QueueOutput) error {
+	p.log.Infof("started handling get modules permissions")
+
 	modules, err := p.modulesQ.Select()
 	if err != nil {
 		return errors.Wrap(err, "failed to select modules")
@@ -43,6 +45,7 @@ func (p *processor) handleGetModulesPermissions(msg types.QueueOutput) error {
 		return err
 	}
 
+	p.log.Infof("finished handling get modules permissions")
 	return nil
 }
 
