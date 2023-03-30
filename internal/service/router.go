@@ -65,6 +65,8 @@ func (s *service) router() chi.Router {
 		r.Route("/users", func(r chi.Router) {
 			r.With(auth.Jwt(s.jwt.Secret, "orchestrator", []string{"read", "write"}...)).
 				Get("/{id}", handlers.GetUserById)
+			r.With(auth.Jwt(s.jwt.Secret, "orchestrator", []string{"read", "write"}...)).
+				Delete("/{id}", handlers.DeleteUserById)
 		})
 	})
 
