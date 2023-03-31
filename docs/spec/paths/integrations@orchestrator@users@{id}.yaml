@@ -17,3 +17,17 @@ get:
                 items:
                   type: object
                   $ref: '#/components/schemas/User'
+delete:
+  tags: [ Users ]
+  summary: Delete user by id
+  operationId: deleteUserById
+  parameters:
+    - $ref: '#/components/parameters/userIdParam'
+    - $ref: '#/components/parameters/fromUserIdParam'
+  responses:
+    '202':
+      description: Accepted
+    '400':
+      description: Bad request.
+    '500':
+      description: Internal server error.
