@@ -7,6 +7,7 @@ import (
 const (
 	ModuleName         = "orchestrator"
 	RemoveModuleAction = "remove_module"
+	DeleteUserAction   = "delete_user"
 )
 
 type PermissionsPayload struct {
@@ -14,6 +15,12 @@ type PermissionsPayload struct {
 	Action            string  `json:"action"`
 	ModulePermissions Modules `json:"module_permissions"`
 	ModuleName        string  `json:"module_name"`
+}
+
+type DeleteUserPayload struct {
+	Action   string  `json:"action"`
+	Username *string `json:"username"`
+	Phone    *string `json:"phone"`
 }
 
 type ModulesRolesResponse struct {

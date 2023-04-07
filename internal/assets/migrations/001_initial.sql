@@ -1,6 +1,6 @@
 -- +migrate Up
 
-create type request_status_enum as enum ('created', 'pending', 'finished', 'failed');
+create type request_status_enum as enum ('pending', 'in progress', 'success', 'failed');
 
 create table if not exists modules (
     name text primary key,
@@ -16,7 +16,7 @@ create table if not exists requests (
     from_user_id bigint not null,
     to_user_id bigint not null,
     payload jsonb not null,
-    status request_status_enum not null default 'created',
+    status request_status_enum not null default 'pending',
     module_name text not null,
     error text,
     created_at timestamp without time zone not null default current_timestamp,

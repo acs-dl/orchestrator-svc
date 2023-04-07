@@ -2,15 +2,16 @@ package data
 
 import (
 	"encoding/json"
+
 	"gitlab.com/distributed_lab/kit/pgdb"
 )
 
 type RequestStatus string
 
 const (
-	CREATED  RequestStatus = "created"
-	PENDING  RequestStatus = "pending"
-	FINISHED RequestStatus = "finished"
+	CREATED  RequestStatus = "pending"
+	PENDING  RequestStatus = "in progress"
+	FINISHED RequestStatus = "success"
 	FAILED   RequestStatus = "failed"
 )
 
