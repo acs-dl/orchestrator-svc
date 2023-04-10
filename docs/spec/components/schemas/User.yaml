@@ -8,7 +8,6 @@ allOf:
         type: object
         required:
           - user_id
-          - username
           - module
         properties:
           user_id:
@@ -18,8 +17,12 @@ allOf:
             example: '666'
           username:
             type: string
-            description: username from gitlab
+            description: username from module
             example: mhrynenko
+          phone:
+            type: string
+            description: phone from module
+            example: 38098...
           module:
             type: string
             description: module name

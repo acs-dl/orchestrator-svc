@@ -1,11 +1,13 @@
 package service
 
 import (
+	"database/sql"
+	"net"
+	"net/http"
+
 	"github.com/ThreeDotsLabs/watermill-amqp/v2/pkg/amqp"
 	"gitlab.com/distributed_lab/acs/orchestrator/internal/data"
 	"gitlab.com/distributed_lab/acs/orchestrator/internal/data/postgres"
-	"net"
-	"net/http"
 
 	"gitlab.com/distributed_lab/acs/orchestrator/internal/config"
 	"gitlab.com/distributed_lab/kit/copus/types"
@@ -22,6 +24,7 @@ type service struct {
 	publisher  *amqp.Publisher
 	subscriber *amqp.Subscriber
 	jwt        *config.JwtCfg
+	rawDB      *sql.DB
 }
 
 func (s *service) run() error {
@@ -45,6 +48,7 @@ func newService(cfg config.Config) *service {
 		publisher:  cfg.Publisher(),
 		subscriber: cfg.Subscriber(),
 		jwt:        cfg.JwtParams(),
+		rawDB:      cfg.RawDB(),
 	}
 }
 

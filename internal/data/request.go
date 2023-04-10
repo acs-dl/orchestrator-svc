@@ -2,15 +2,16 @@ package data
 
 import (
 	"encoding/json"
+
 	"gitlab.com/distributed_lab/kit/pgdb"
 )
 
 type RequestStatus string
 
 const (
-	CREATED  RequestStatus = "created"
-	PENDING  RequestStatus = "pending"
-	FINISHED RequestStatus = "finished"
+	CREATED  RequestStatus = "pending"
+	PENDING  RequestStatus = "in progress"
+	FINISHED RequestStatus = "success"
 	FAILED   RequestStatus = "failed"
 )
 
@@ -33,6 +34,7 @@ type RequestQ interface {
 	FilterByStatuses(statuses ...RequestStatus) RequestQ
 	FilterByFromIds(ids ...int64) RequestQ
 	FilterByToIds(ids ...int64) RequestQ
+	FilterNotByActions(actions ...string) RequestQ
 	JoinsModule() RequestQ
 
 	Get() (*Request, error)

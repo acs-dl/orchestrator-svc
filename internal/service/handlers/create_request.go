@@ -35,6 +35,19 @@ func CreateRequest(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	module, err := helpers.ModulesQ(r).FilterByNames(request.Data.Attributes.Module).Get()
+	if err != nil {
+		helpers.Log(r).WithError(err).Errorf("failed to get module with name `%s`", request.Data.Attributes.Module)
+		ape.RenderErr(w, problems.InternalError())
+		return
+	}
+
+	if module == nil {
+		helpers.Log(r).WithError(err).Errorf("no module with name `%s`", request.Data.Attributes.Module)
+		ape.RenderErr(w, problems.NotFound())
+		return
+	}
+
 	requestData := data.Request{
 		ID:         uuid.New().String(),
 		FromUserID: fromUserId,
@@ -52,6 +65,7 @@ func CreateRequest(w http.ResponseWriter, r *http.Request) {
 	}
 
 	helpers.Log(r).Infof("successfully created request with id `%s`", requestData.ID)
+	w.WriteHeader(http.StatusAccepted)
 	ape.Render(w, newRequestResponse(requestData))
 }
 

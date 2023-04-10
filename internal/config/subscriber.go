@@ -26,7 +26,7 @@ func (c *config) Subscriber() *amqp.Subscriber {
 			panic(errors.Wrap(err, "failed to figure out subscriber config"))
 		}
 
-		amqpConfig := amqp.NewDurablePubSubConfig(cfg.AmqpUrl, amqp.GenerateQueueNameTopicNameWithSuffix("SUFFIX"))
+		amqpConfig := amqp.NewDurablePubSubConfig(cfg.AmqpUrl, amqp.GenerateQueueNameTopicNameWithSuffix("orchestrator"))
 		if err != nil {
 			panic(errors.Wrap(err, "failed to create subscriber config"))
 		}

@@ -1,10 +1,11 @@
 package middleware
 
 import (
+	"log"
 	"net/http"
 	"strings"
 
-	"gitlab.com/distributed_lab/acs/auth/internal/service/helpers"
+	"gitlab.com/distributed_lab/acs/auth/internal/service/api/helpers"
 	"gitlab.com/distributed_lab/ape"
 	"gitlab.com/distributed_lab/ape/problems"
 )
@@ -14,22 +15,25 @@ func Jwt(secret, module string, permissions ...string) func(http.Handler) http.H
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			authHeader := r.Header.Get("Authorization")
 			if authHeader == "" {
+				log.Println("no auth header provided")
 				ape.RenderErr(w, problems.Unauthorized())
 				return
 			}
 
 			splitAuthHeader := strings.Split(authHeader, " ")
-			if len(splitAuthHeader) < 2 {
+			if len(splitAuthHeader) != 2 {
+				log.Println("header must consist from two parts")
 				ape.RenderErr(w, problems.Unauthorized())
 				return
 			}
-			claims, err := helpers.ParseJwtToken(splitAuthHeader[1], secret)
+			claims, err := helpers.RetrieveClaimsFromJwtString(splitAuthHeader[1], secret)
 			if err != nil {
+				log.Println(err, ":failed to retrieve claims from jwt string")
 				ape.RenderErr(w, problems.BadRequest(err)...)
 				return
 			}
 
-			splitModulePermission := strings.Split(claims["module.permission"].(string), "/")
+			splitModulePermission := strings.Split(claims.ModulePermission, "/")
 
 			permissionMap := make(map[string]string)
 			for _, modulePermission := range splitModulePermission {
@@ -48,6 +52,7 @@ func Jwt(secret, module string, permissions ...string) func(http.Handler) http.H
 				}
 			}
 
+			log.Println("no needed permission was granted")
 			ape.RenderErr(w, problems.Forbidden())
 		})
 	}

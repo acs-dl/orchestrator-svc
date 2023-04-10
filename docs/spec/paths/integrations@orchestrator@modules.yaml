@@ -37,4 +37,4 @@ get:
             properties:
               data:
                 type: object
-                $ref: '#/components/schemas/ModuleIcon'
+                $ref: '#/components/schemas/ModuleInfo'

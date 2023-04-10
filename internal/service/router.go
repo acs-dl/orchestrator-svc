@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+
 	"github.com/go-chi/chi"
 	auth "gitlab.com/distributed_lab/acs/auth/middlewares"
 	"gitlab.com/distributed_lab/acs/orchestrator/internal/receiver"
@@ -25,10 +26,20 @@ func (s *service) router() chi.Router {
 			helpers.CtxLog(s.log),
 			helpers.CtxModulesQ(s.modulesQ),
 			helpers.CtxRequestsQ(s.requestsQ),
+			helpers.CtxSender(sender.NewSender(s.publisher, s.requestsQ, s.modulesQ)),
+			helpers.CtxRawDB(s.rawDB),
+			helpers.CtxPublisher(s.publisher),
+			helpers.CtxSubscriber(s.subscriber),
 		),
 	)
 
 	r.Route("/integrations/orchestrator", func(r chi.Router) {
+		r.Route("/health", func(r chi.Router) {
+			r.Get("/live", handlers.CheckHealthLive)
+			r.Get("/ready", handlers.CheckHealthReady)
+			r.Get("/status", handlers.CheckHealthStatus)
+		})
+
 		r.Route("/modules", func(r chi.Router) {
 			r.Post("/", handlers.RegisterModule)           // comes from modules
 			r.Delete("/{name}", handlers.UnregisterModule) // comes from modules
@@ -54,6 +65,8 @@ func (s *service) router() chi.Router {
 		r.Route("/users", func(r chi.Router) {
 			r.With(auth.Jwt(s.jwt.Secret, "orchestrator", []string{"read", "write"}...)).
 				Get("/{id}", handlers.GetUserById)
+			r.With(auth.Jwt(s.jwt.Secret, "orchestrator", []string{"read", "write"}...)).
+				Delete("/{id}", handlers.DeleteUserById)
 		})
 	})
 
@@ -62,7 +75,8 @@ func (s *service) router() chi.Router {
 
 func (s *service) startListener(ctx context.Context) error {
 	s.log.Info("Starting listener")
-	receiver.NewReceiver(s.subscriber, s.modulesQ, s.requestsQ).Run(ctx)
+
+	receiver.NewReceiver(s.subscriber, s.modulesQ, s.requestsQ, sender.NewSender(s.publisher, s.requestsQ, s.modulesQ)).Run(ctx)
 	return nil
 }
 

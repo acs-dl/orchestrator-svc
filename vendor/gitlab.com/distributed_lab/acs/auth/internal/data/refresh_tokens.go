@@ -5,13 +5,15 @@ type RefreshTokens interface {
 
 	Create(token RefreshToken) error
 	Get() (*RefreshToken, error)
+	Select() ([]RefreshToken, error)
 	Delete(token string) error
 
 	FilterByToken(token string) RefreshTokens
+	FilterByValidTill(expiresAtUnix int64) RefreshTokens
 }
 
 type RefreshToken struct {
 	Token     string `db:"token" structs:"token"`
 	OwnerId   int64  `db:"owner_id" structs:"owner_id"`
-	ValidDate int64  `db:"valid_date" structs:"valid_date"`
+	ValidTill int64  `db:"valid_till" structs:"valid_till"`
 }

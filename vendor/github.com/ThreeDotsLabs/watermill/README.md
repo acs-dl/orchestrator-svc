@@ -1,7 +1,7 @@
 # Watermill
 <img align="right" width="200" src="https://threedots.tech/watermill-io/watermill-logo.png">
 
-[![CircleCI](https://circleci.com/gh/ThreeDotsLabs/watermill/tree/master.svg?style=svg)](https://circleci.com/gh/ThreeDotsLabs/watermill/tree/master)
+[![CI Status](https://github.com/ThreeDotsLabs/watermill/actions/workflows/master.yml/badge.svg)](https://github.com/ThreeDotsLabs/watermill/actions/workflows/master.yml)
 [![Go Report Card](https://goreportcard.com/badge/github.com/ThreeDotsLabs/watermill)](https://goreportcard.com/report/github.com/ThreeDotsLabs/watermill)
 [![codecov](https://codecov.io/gh/ThreeDotsLabs/watermill/branch/master/graph/badge.svg)](https://codecov.io/gh/ThreeDotsLabs/watermill)
 
@@ -25,6 +25,10 @@ Pick what you like the best or see in order:
 1. Follow the [Getting Started guide](https://watermill.io/docs/getting-started/).
 2. See examples below.
 3. Read the full documentation: https://watermill.io/
+
+## Our online hands-on training
+
+<a href="https://threedots.tech/event-driven/?utm_source=watermill-readme"><img align="center" width="400" src="https://threedots.tech/event-driven-banner.png"></a>
 
 ## Examples
 
@@ -87,17 +91,25 @@ type Subscriber interface {
 
 Supported Pub/Subs:
 
-
-- AMQP Pub/Sub [(`github.com/ThreeDotsLabs/watermill-amqp`)](https://github.com/ThreeDotsLabs/watermill-amqp/)
+- AMQP Pub/Sub [(`github.com/ThreeDotsLabs/watermill-amqp/v2`)](https://github.com/ThreeDotsLabs/watermill-amqp/)
+- Bolt Pub/Sub [(`github.com/ThreeDotsLabs/watermill-bolt`)](https://github.com/ThreeDotsLabs/watermill-bolt/)
+- Firestore Pub/Sub [(`github.com/ThreeDotsLabs/watermill-firestore`)](https://github.com/ThreeDotsLabs/watermill-firestore/)
 - Google Cloud Pub/Sub [(`github.com/ThreeDotsLabs/watermill-googlecloud`)](https://github.com/ThreeDotsLabs/watermill-googlecloud/)
 - HTTP Pub/Sub [(`github.com/ThreeDotsLabs/watermill-http`)](https://github.com/ThreeDotsLabs/watermill-http/)
 - io.Reader/io.Writer Pub/Sub [(`github.com/ThreeDotsLabs/watermill-io`)](https://github.com/ThreeDotsLabs/watermill-io/)
-- Kafka Pub/Sub [(`github.com/ThreeDotsLabs/watermill-kafka`)](https://github.com/ThreeDotsLabs/watermill-kafka/)
+- Kafka Pub/Sub [(`github.com/ThreeDotsLabs/watermill-kafka/v2`)](https://github.com/ThreeDotsLabs/watermill-kafka/)
 - NATS Pub/Sub [(`github.com/ThreeDotsLabs/watermill-nats`)](https://github.com/ThreeDotsLabs/watermill-nats/)
+- Redis Stream Pub/Sub [(`github.com/ThreeDotsLabs/watermill-redisstream`)](https://github.com/ThreeDotsLabs/watermill-redisstream/)
 - SQL Pub/Sub [(`github.com/ThreeDotsLabs/watermill-sql`)](https://github.com/ThreeDotsLabs/watermill-sql/)
 
 
 All Pub/Subs implementation documentation can be found in the [documentation](https://watermill.io/pubsubs/).
+
+## Unofficial libraries
+
+Can't find your favorite Pub/Sub or library integration? Check [Awesome Watermill](https://watermill.io/docs/awesome/).
+
+If you know another library or are an author of one, please [add it to the list](https://github.com/ThreeDotsLabs/watermill/edit/master/docs/content/docs/awesome.md).
 
 ## Contributing
 

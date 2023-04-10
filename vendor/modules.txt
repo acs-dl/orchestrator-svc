@@ -1,13 +1,13 @@
 # github.com/Masterminds/squirrel v1.5.3
 ## explicit; go 1.14
 github.com/Masterminds/squirrel
-# github.com/ThreeDotsLabs/watermill v1.2.0-rc.7
+# github.com/ThreeDotsLabs/watermill v1.2.0
 ## explicit; go 1.17
 github.com/ThreeDotsLabs/watermill
 github.com/ThreeDotsLabs/watermill/internal
 github.com/ThreeDotsLabs/watermill/message
 github.com/ThreeDotsLabs/watermill/pubsub/sync
-# github.com/ThreeDotsLabs/watermill-amqp/v2 v2.0.6
+# github.com/ThreeDotsLabs/watermill-amqp/v2 v2.0.7
 ## explicit; go 1.17
 github.com/ThreeDotsLabs/watermill-amqp/v2/pkg/amqp
 # github.com/alecthomas/kingpin v2.2.6+incompatible
@@ -141,10 +141,10 @@ github.com/spf13/viper
 # github.com/subosito/gotenv v1.2.0
 ## explicit
 github.com/subosito/gotenv
-# gitlab.com/distributed_lab/acs/auth v0.0.0-20230202160032-c779e38da077
+# gitlab.com/distributed_lab/acs/auth v0.0.0-20230328135644-b4f544227e27
 ## explicit; go 1.19
 gitlab.com/distributed_lab/acs/auth/internal/data
-gitlab.com/distributed_lab/acs/auth/internal/service/helpers
+gitlab.com/distributed_lab/acs/auth/internal/service/api/helpers
 gitlab.com/distributed_lab/acs/auth/middlewares
 # gitlab.com/distributed_lab/ape v1.7.1
 ## explicit; go 1.14
@@ -185,7 +185,7 @@ gitlab.com/distributed_lab/urlval/internal/betterreflect
 ## explicit; go 1.17
 # golang.org/x/net v0.3.0
 ## explicit; go 1.17
-# golang.org/x/sys v0.3.0
+# golang.org/x/sys v0.4.0
 ## explicit; go 1.17
 golang.org/x/sys/internal/unsafeheader
 golang.org/x/sys/unix

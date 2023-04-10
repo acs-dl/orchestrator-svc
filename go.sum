@@ -54,8 +54,12 @@ github.com/Masterminds/squirrel v1.5.3/go.mod h1:NNaOrjSoIDfDA40n7sr2tPNZRfjzjA4
 github.com/Shopify/goreferrer v0.0.0-20181106222321-ec9c9a553398/go.mod h1:a1uqRtAwp2Xwc6WNPJEufxJ7fx3npB4UV/JOLmbu5I0=
 github.com/ThreeDotsLabs/watermill v1.2.0-rc.7 h1:c7rlzfhUFPtNo2WiJuIhrdwAfZcuAfbvB29uF+I0z7c=
 github.com/ThreeDotsLabs/watermill v1.2.0-rc.7/go.mod h1:QLZSaklpSZ/7yv288LL2DFOgCEi86VYEmQvzmaMlHoA=
+github.com/ThreeDotsLabs/watermill v1.2.0 h1:TU3TML1dnQ/ifK09F2+4JQk2EKhmhXe7Qv7eb5ZpTS8=
+github.com/ThreeDotsLabs/watermill v1.2.0/go.mod h1:IuVxGk/kgCN0cex2S94BLglUiB0PwOm8hbUhm6g2Nx4=
 github.com/ThreeDotsLabs/watermill-amqp/v2 v2.0.6 h1:+aqEuhH6AmTeoeAlC0y8iz3i78jt/2Bx2x+CdoMx3Q8=
 github.com/ThreeDotsLabs/watermill-amqp/v2 v2.0.6/go.mod h1:DKOBUoMVtPMV8jBEbRP3NL6TgnOMyRvVza3W297cdqU=
+github.com/ThreeDotsLabs/watermill-amqp/v2 v2.0.7 h1:AUSXLqdsA1LXWuoQSkIRG9FhMo6EYM9GSgd+bnf1W0w=
+github.com/ThreeDotsLabs/watermill-amqp/v2 v2.0.7/go.mod h1:DKOBUoMVtPMV8jBEbRP3NL6TgnOMyRvVza3W297cdqU=
 github.com/ajg/form v1.5.1/go.mod h1:uL1WgH+h2mgNtvBq0339dVnzXdBETtL2LeUXaIv25UY=
 github.com/alecthomas/kingpin v2.2.6+incompatible h1:5svnBTFgJjZvGKyYBtMB0+m5wvrbUHiqye8wRJMlnYI=
 github.com/alecthomas/kingpin v2.2.6+incompatible/go.mod h1:59OFYbFVLKQKq+mqrL6Rw5bR0c3ACQaawgXx0QYndlE=
@@ -490,6 +494,10 @@ gitlab.com/distributed_lab/acs/auth v0.0.0-20230202120135-94c549736b1a h1:ufMKFV
 gitlab.com/distributed_lab/acs/auth v0.0.0-20230202120135-94c549736b1a/go.mod h1:MTJBcrAZbUve2Iz/o46D9xRhPZvEeArlf1Ug1lG6LyU=
 gitlab.com/distributed_lab/acs/auth v0.0.0-20230202160032-c779e38da077 h1:Gc4n5I5avk5C/VRHzJ8Nkf4ZrpLUuq9zIzxNUAKeFPA=
 gitlab.com/distributed_lab/acs/auth v0.0.0-20230202160032-c779e38da077/go.mod h1:MTJBcrAZbUve2Iz/o46D9xRhPZvEeArlf1Ug1lG6LyU=
+gitlab.com/distributed_lab/acs/auth v0.0.0-20230309115252-2c1f9e1d211a h1:ZD9Htsle72NgSMdHb292tGUWXQcDToErcPAsaoC7ir8=
+gitlab.com/distributed_lab/acs/auth v0.0.0-20230309115252-2c1f9e1d211a/go.mod h1:0kZvT9LUCzy0cORWP21ue/u4CAuRcJWzO3ANJBCYc3A=
+gitlab.com/distributed_lab/acs/auth v0.0.0-20230328135644-b4f544227e27 h1:sRvcQtHJ+/mUo10G/cDmVm+yVRv3MAxGSH4WL34XTgo=
+gitlab.com/distributed_lab/acs/auth v0.0.0-20230328135644-b4f544227e27/go.mod h1:7KA4zDZelWxUVX7l/PMRvCw8CCzhVH+EDEYYu79LU0M=
 gitlab.com/distributed_lab/ape v1.7.1 h1:LpTmZgG7Lvx6ulopQbH2aWI3s8ey9FsKVjbic3ZQIy4=
 gitlab.com/distributed_lab/ape v1.7.1/go.mod h1:Qy9Y2arL0hmZIpVpctGEFhdrVsjWtyVJ5G+bZWcFT4s=
 gitlab.com/distributed_lab/figure v2.1.0+incompatible h1:8kNtvWO91BSQ4OsqL2P3qNWSBnh/Q/TdWB8vHy8xvNI=
@@ -693,6 +701,8 @@ golang.org/x/sys v0.0.0-20211216021012-1d35b9e2eb4e h1:fLOSk5Q00efkSvAm+4xcoXD+R
 golang.org/x/sys v0.0.0-20211216021012-1d35b9e2eb4e/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
 golang.org/x/sys v0.3.0 h1:w8ZOecv6NaNa/zC8944JTU3vz4u6Lagfk4RPQxv92NQ=
 golang.org/x/sys v0.3.0/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
+golang.org/x/sys v0.4.0 h1:Zr2JFtRQNX3BCZ8YtxRE9hNJYC8J6I1MVbMg6owUp18=
+golang.org/x/sys v0.4.0/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
 golang.org/x/term v0.0.0-20201126162022-7de9c90e9dd1/go.mod h1:bj7SfCRtBDWHUb9snDiAeCFNEtKQo2Wmx5Cou7ajbmo=
 golang.org/x/term v0.0.0-20210927222741-03fcf44c2211 h1:JGgROgKl9N8DuW20oFS5gxc+lE67/N3FcwmBPMe7ArY=
 golang.org/x/term v0.0.0-20210927222741-03fcf44c2211/go.mod h1:jbD1KX2456YbFQfuXm/mYQcufACuNUgVhRMnK/tPxf8=

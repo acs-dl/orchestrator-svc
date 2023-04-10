@@ -3,7 +3,7 @@ package data
 type Modules interface {
 	New() Modules
 
-	Create(module Module) (*Module, error)
+	Upsert(module Module) error
 	Select() ([]Module, error)
 	GetByName(name string) (*Module, error)
 	Delete(moduleName string) error

@@ -4,8 +4,8 @@ go 1.19
 
 require (
 	github.com/Masterminds/squirrel v1.5.3
-	github.com/ThreeDotsLabs/watermill v1.2.0-rc.7
-	github.com/ThreeDotsLabs/watermill-amqp/v2 v2.0.6
+	github.com/ThreeDotsLabs/watermill v1.2.0
+	github.com/ThreeDotsLabs/watermill-amqp/v2 v2.0.7
 	github.com/alecthomas/kingpin v2.2.6+incompatible
 	github.com/fatih/structs v1.1.0
 	github.com/go-chi/chi v4.1.2+incompatible
@@ -54,11 +54,11 @@ require (
 	github.com/spf13/viper v1.8.1 // indirect
 	github.com/stretchr/testify v1.8.1 // indirect
 	github.com/subosito/gotenv v1.2.0 // indirect
-	gitlab.com/distributed_lab/acs/auth v0.0.0-20230202160032-c779e38da077 // indirect
+	gitlab.com/distributed_lab/acs/auth v0.0.0-20230328135644-b4f544227e27 // indirect
 	gitlab.com/distributed_lab/lorem v0.2.0 // indirect
 	golang.org/x/crypto v0.4.0 // indirect
 	golang.org/x/net v0.3.0 // indirect
-	golang.org/x/sys v0.3.0 // indirect
+	golang.org/x/sys v0.4.0 // indirect
 	golang.org/x/text v0.5.0 // indirect
 	gopkg.in/ini.v1 v1.62.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect

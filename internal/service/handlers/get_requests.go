@@ -8,6 +8,7 @@ import (
 	"gitlab.com/distributed_lab/ape"
 	"gitlab.com/distributed_lab/ape/problems"
 	"net/http"
+	"strings"
 )
 
 func GetRequests(w http.ResponseWriter, r *http.Request) {
@@ -31,6 +32,11 @@ func GetRequests(w http.ResponseWriter, r *http.Request) {
 	if request.Status != nil {
 		requestsQ = requestsQ.FilterByStatuses(data.RequestStatus(*request.Status))
 		countRequestsQ = countRequestsQ.FilterByStatuses(data.RequestStatus(*request.Status))
+	}
+	if request.Action != nil {
+		actions := strings.Split(*request.Action, " ")
+		requestsQ = requestsQ.FilterNotByActions(actions...)
+		countRequestsQ = countRequestsQ.FilterNotByActions(actions...)
 	}
 
 	dbRequests, err := requestsQ.Page(request.OffsetPageParams).Select()
