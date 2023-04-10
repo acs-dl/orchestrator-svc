@@ -32,7 +32,7 @@ func GetRoles(w http.ResponseWriter, r *http.Request) {
 	for _, module := range modules {
 		moduleRoles, err := MakeGetRolesRequest(module.Link, "/roles")
 		if err != nil {
-			helpers.Log(r).WithError(err).Infof("failed to get roles from module `%s`", module.Name)
+			helpers.Log(r).WithError(err).Infof("failed to get roles from `%s`", module.Link+"/roles")
 			ape.RenderErr(w, problems.InternalError())
 			return
 		}

@@ -23,7 +23,7 @@ func (p *processor) handleGetModulesPermissions(msg types.QueueOutput) error {
 	for _, module := range modules {
 		res, err := handlers.MakeGetRolesRequest(module.Link, "/user_roles")
 		if err != nil {
-			p.log.WithError(err).Errorf("failed to get user roles from `%s`", module)
+			p.log.WithError(err).Errorf("failed to get user roles from `%s`", module.Link+"/user_roles")
 			return errors.Wrap(err, "failed to get user roles")
 		}
 		moduleRoles[module.Name] = res.Data.Attributes
