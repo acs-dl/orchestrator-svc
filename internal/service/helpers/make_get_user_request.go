@@ -9,7 +9,7 @@ import (
 	"gitlab.com/distributed_lab/logan/v3/errors"
 )
 
-func MakeRequest(moduleLink, userId string, counter int64) (*resources.User, error) {
+func MakeGetUserRequest(moduleLink, userId string, counter int64) (*resources.User, error) {
 	link := fmt.Sprintf(moduleLink+"/users/%s", userId)
 	req, err := http.NewRequest(http.MethodGet, link, nil)
 	if err != nil {

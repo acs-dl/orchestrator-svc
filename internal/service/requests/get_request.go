@@ -1,9 +1,10 @@
 package requests
 
 import (
+	"net/http"
+
 	"github.com/go-chi/chi"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
-	"net/http"
 )
 
 type GetRequestRequest struct {

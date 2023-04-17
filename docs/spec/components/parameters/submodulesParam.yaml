@@ -1,0 +1,7 @@
+name: 'filter[submodule]'
+in: path
+description: The submodules of module, it's a string joined by space character " "
+required: false
+schema:
+  type: string
+  example: "distributed_lab/acs test_acs"

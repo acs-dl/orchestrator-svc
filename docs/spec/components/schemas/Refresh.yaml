@@ -1,0 +1,19 @@
+allOf:
+  - $ref: '#/components/schemas/RefreshKey'
+  - type: object
+    required:
+      - attributes
+    properties:
+      attributes:
+        type: object
+        properties:
+          moduleName:
+            type: string
+            description: Module name
+            example: "github"
+          submodule:
+            type: array
+            items:
+              type: string
+            description: Submodules of module
+            example: "[distributed_lab/acs, test_acs]"

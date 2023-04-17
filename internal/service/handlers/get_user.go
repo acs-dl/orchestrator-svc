@@ -32,7 +32,7 @@ func GetUserById(w http.ResponseWriter, r *http.Request) {
 
 	var result = make([]resources.User, 0)
 	for i, module := range modules {
-		returned, err := helpers.MakeRequest(module.Link, request.Id, int64(i))
+		returned, err := helpers.MakeGetUserRequest(module.Link, request.Id, int64(i))
 		if err != nil {
 			helpers.Log(r).WithError(err).Errorf("failed to get user with id `%s` from module `%s`", request.Id, module.Name)
 			ape.RenderErr(w, problems.InternalError())

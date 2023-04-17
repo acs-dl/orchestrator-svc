@@ -45,7 +45,7 @@ func DeleteUserById(w http.ResponseWriter, r *http.Request) {
 
 	var userinfoModules = make([]resources.User, 0)
 	for i, module := range modules {
-		returned, err := helpers.MakeRequest(module.Link, request.Id, int64(i))
+		returned, err := helpers.MakeGetUserRequest(module.Link, request.Id, int64(i))
 		if err != nil {
 			helpers.Log(r).WithError(err).Errorf("failed to get user with id `%s` from module `%s`", request.Id, module.Name)
 			ape.RenderErr(w, problems.InternalError())
@@ -166,7 +166,13 @@ func checkIdentityRegisteredAndMakeDeleteUserRequest(moduleQ data.ModuleQ, userI
 		return errors.Errorf("no module with name `identity`")
 	}
 
-	err = helpers.MakeDeleteUserRequest(module.Link, userId, authHeader)
+	err = helpers.MakeNoResponseRequest(data.RequestParams{
+		Method:     http.MethodDelete,
+		Link:       module.Link + "/users/" + userId,
+		AuthHeader: &authHeader,
+		Body:       nil,
+		Query:      nil,
+	})
 	if err != nil {
 		return errors.Wrap(err, "failed to make delete user request")
 	}

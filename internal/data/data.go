@@ -43,3 +43,11 @@ type ModuleRoles struct {
 type ModuleRolesResponse struct {
 	Data ModuleRoles `json:"data"`
 }
+
+type RequestParams struct {
+	Method     string
+	Link       string
+	Body       []byte
+	Query      map[string]string
+	AuthHeader *string
+}
