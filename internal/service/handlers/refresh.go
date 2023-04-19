@@ -57,14 +57,9 @@ func Refresh(w http.ResponseWriter, r *http.Request) {
 	ape.Render(w, http.StatusAccepted)
 }
 
-func refreshModuleSubmodules(modulesQ data.ModuleQ, moduleName, authHeader string, submodules []string) error {
-	module, err := modulesQ.FilterByNames(moduleName).Get()
-	if err != nil {
-		return errors.Wrap(err, "failed to get module")
-	}
-
-	if module == nil {
-		return errors.New("no such module")
+func createJsonSubmodulesBody(submodules []string) ([]byte, error) {
+	type req struct {
+		Data resources.Submodule `json:"data"`
 	}
 
 	body := resources.Submodule{
@@ -77,16 +72,36 @@ func refreshModuleSubmodules(modulesQ data.ModuleQ, moduleName, authHeader strin
 		},
 	}
 
-	bodyBytes, err := json.Marshal(body)
+	newReq := req{Data: body}
+
+	bodyBytes, err := json.Marshal(newReq)
 	if err != nil {
-		return errors.Wrap(err, "failed to marshal body")
+		return nil, errors.Wrap(err, "failed to marshal body")
+	}
+
+	return bodyBytes, nil
+}
+
+func refreshModuleSubmodules(modulesQ data.ModuleQ, moduleName, authHeader string, submodules []string) error {
+	module, err := modulesQ.FilterByNames(moduleName).Get()
+	if err != nil {
+		return errors.Wrap(err, "failed to get module")
+	}
+
+	if module == nil {
+		return errors.New("no such module")
+	}
+
+	body, err := createJsonSubmodulesBody(submodules)
+	if err != nil {
+		return err
 	}
 
 	err = helpers.MakeNoResponseRequest(data.RequestParams{
 		Method:     http.MethodPost,
 		Link:       module.Link + "/refresh/submodule",
 		AuthHeader: &authHeader,
-		Body:       bodyBytes,
+		Body:       body,
 		Query:      nil,
 	})
 	if err != nil {

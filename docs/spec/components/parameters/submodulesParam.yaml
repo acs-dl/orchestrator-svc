@@ -1,5 +1,5 @@
 name: 'filter[submodule]'
-in: path
+in: query
 description: The submodules of module, it's a string joined by space character " "
 required: false
 schema:

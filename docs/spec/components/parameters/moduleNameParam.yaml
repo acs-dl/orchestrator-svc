@@ -1,6 +1,6 @@
 in: query
 name: 'filter[moduleName]'
-required: true
+required: false
 schema:
   type: string
   description: >-

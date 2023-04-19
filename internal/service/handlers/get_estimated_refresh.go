@@ -14,17 +14,17 @@ import (
 )
 
 func GetEstimatedRefreshTime(w http.ResponseWriter, r *http.Request) {
-	request, err := requests.NewGetEstimatedRefreshRequest(r)
+	request, err := requests.NewRefreshRequest(r)
 	if err != nil {
 		helpers.Log(r).WithError(err).Error("failed to parse request")
 		ape.RenderErr(w, problems.BadRequest(err)...)
 		return
 	}
 
-	if request.ModuleName == nil {
+	if request.Data.Attributes.ModuleName == nil {
 		estimatedTimeResponse, err := getEstimatedRefreshModules(helpers.ModulesQ(r), r.Header.Get("Authorization"))
 		if err != nil {
-			helpers.Log(r).WithError(err).Error("failed to refresh modules")
+			helpers.Log(r).WithError(err).Error("failed to get estimated refresh modules")
 			ape.RenderErr(w, problems.InternalError())
 			return
 		}
@@ -33,10 +33,10 @@ func GetEstimatedRefreshTime(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if request.Submodule == nil {
-		estimatedTimeResponse, err := getEstimatedRefreshModule(helpers.ModulesQ(r), *request.ModuleName, r.Header.Get("Authorization"))
+	if request.Data.Attributes.Submodule == nil {
+		estimatedTimeResponse, err := getEstimatedRefreshModule(helpers.ModulesQ(r), *request.Data.Attributes.ModuleName, r.Header.Get("Authorization"))
 		if err != nil {
-			helpers.Log(r).WithError(err).Error("failed to refresh module")
+			helpers.Log(r).WithError(err).Error("failed to get estimated refresh module")
 			ape.RenderErr(w, problems.InternalError())
 			return
 		}
@@ -45,10 +45,10 @@ func GetEstimatedRefreshTime(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	estimatedTimeResponse, err := getEstimatedRefreshModuleSubmodules(helpers.ModulesQ(r), *request.ModuleName, r.Header.Get("Authorization"), *request.Submodule)
+	estimatedTimeResponse, err := getEstimatedRefreshModuleSubmodules(helpers.ModulesQ(r), *request.Data.Attributes.ModuleName, r.Header.Get("Authorization"), *request.Data.Attributes.Submodule)
 	if err != nil {
 		if err != nil {
-			helpers.Log(r).WithError(err).Error("failed to refresh module submodule")
+			helpers.Log(r).WithError(err).Error("failed to get estimated refresh module submodule")
 			ape.RenderErr(w, problems.InternalError())
 			return
 		}
@@ -57,7 +57,7 @@ func GetEstimatedRefreshTime(w http.ResponseWriter, r *http.Request) {
 	ape.Render(w, estimatedTimeResponse)
 }
 
-func getEstimatedRefreshModuleSubmodules(modulesQ data.ModuleQ, moduleName, authHeader, submodules string) (*resources.EstimatedTimeResponse, error) {
+func getEstimatedRefreshModuleSubmodules(modulesQ data.ModuleQ, moduleName, authHeader string, submodules []string) (*resources.EstimatedTimeResponse, error) {
 	module, err := modulesQ.FilterByNames(moduleName).Get()
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to get module")
@@ -67,14 +67,17 @@ func getEstimatedRefreshModuleSubmodules(modulesQ data.ModuleQ, moduleName, auth
 		return nil, errors.New("no such module")
 	}
 
+	body, err := createJsonSubmodulesBody(submodules)
+	if err != nil {
+		return nil, err
+	}
+
 	estimatedTime, err := helpers.MakeGetEstimatedTimeRequest(data.RequestParams{
-		Method:     http.MethodGet,
-		Link:       module.Link + "/refresh/submodule",
+		Method:     http.MethodPost,
+		Link:       module.Link + "/estimate_refresh/submodule",
 		AuthHeader: &authHeader,
-		Body:       nil,
-		Query: map[string]string{
-			"filter[submodule]": submodules,
-		},
+		Body:       body,
+		Query:      nil,
 	})
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to make refresh request")
@@ -94,8 +97,8 @@ func getEstimatedRefreshModule(modulesQ data.ModuleQ, moduleName, authHeader str
 	}
 
 	estimatedTime, err := helpers.MakeGetEstimatedTimeRequest(data.RequestParams{
-		Method:     http.MethodGet,
-		Link:       module.Link + "/refresh/module",
+		Method:     http.MethodPost,
+		Link:       module.Link + "/estimate_refresh/module",
 		AuthHeader: &authHeader,
 		Body:       nil,
 		Query:      nil,
@@ -116,8 +119,8 @@ func getEstimatedRefreshModules(modulesQ data.ModuleQ, authHeader string) (*reso
 	var estimatedTime time.Duration
 	for _, module := range modules {
 		moduleEstimatedTime, err := helpers.MakeGetEstimatedTimeRequest(data.RequestParams{
-			Method:     http.MethodGet,
-			Link:       module.Link + "/refresh/module",
+			Method:     http.MethodPost,
+			Link:       module.Link + "/estimate_refresh/module",
 			AuthHeader: &authHeader,
 			Body:       nil,
 			Query:      nil,

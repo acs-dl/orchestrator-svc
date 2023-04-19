@@ -40,10 +40,8 @@ func (s *service) router() chi.Router {
 			r.Get("/status", handlers.CheckHealthStatus)
 		})
 
-		r.Route("/refresh", func(r chi.Router) {
-			r.Get("/", handlers.GetEstimatedRefreshTime)
-			r.Post("/", handlers.Refresh)
-		})
+		r.Post("/estimate_refresh", handlers.GetEstimatedRefreshTime)
+		r.Post("/refresh", handlers.Refresh)
 
 		r.Route("/modules", func(r chi.Router) {
 			r.Post("/", handlers.RegisterModule)           // comes from modules
