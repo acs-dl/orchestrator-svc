@@ -7,7 +7,7 @@ allOf:
       attributes:
         type: object
         properties:
-          moduleName:
+          module_name:
             type: string
             description: Module name
             example: "github"

@@ -6,7 +6,7 @@ package resources
 
 type RefreshAttributes struct {
 	// Module name
-	ModuleName *string `json:"moduleName,omitempty"`
+	ModuleName *string `json:"module_name,omitempty"`
 	// Submodules of module
 	Submodule *[]string `json:"submodule,omitempty"`
 }

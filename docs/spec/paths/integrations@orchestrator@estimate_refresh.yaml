@@ -1,4 +1,4 @@
-get:
+post:
   tags: [ Refresh ]
   summary: Get estimated time
   description: Endpoint for getting estimated time for refreshing modules or submodules.

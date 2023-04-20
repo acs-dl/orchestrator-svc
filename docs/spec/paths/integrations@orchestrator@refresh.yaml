@@ -20,22 +20,3 @@ post:
       description: Bad request.
     '500':
       description: Internal server error.
-
-get:
-  tags: [ Refresh ]
-  summary: Get estimated time
-  operationId: getRequests
-  parameters:
-    - $ref: '#/components/parameters/moduleNameParam'
-    - $ref: '#/components/parameters/submodulesParam'
-  responses:
-    '200':
-      description: Success
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              data:
-                type: object
-                $ref: '#/components/schemas/EstimatedTime'
