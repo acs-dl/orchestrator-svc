@@ -1,0 +1,24 @@
+get:
+  tags:
+    - Submodule
+  summary: Check submodule
+  operationId: checkSubmodule
+  description: Endpoint for checking submodule existence.
+  parameters:
+    - $ref: '#/components/parameters/moduleNameParam'
+    - $ref: '#/components/parameters/submoduleParam'
+  responses:
+    '200':
+      description: Success
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                type: object
+                $ref: '#/components/schemas/Submodule'
+    '400':
+      description: Bad request.
+    '500':
+      description: Internal server error.
