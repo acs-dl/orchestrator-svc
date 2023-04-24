@@ -4,6 +4,5 @@ required: false
 schema:
   type: string
   description: >-
-    Filter by module name. If moduleNameParam is not specified, all modules are
-    returned.
+    Filter by module name.
   example: "github"

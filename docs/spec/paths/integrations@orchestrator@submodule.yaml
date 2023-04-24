@@ -17,7 +17,7 @@ get:
             properties:
               data:
                 type: object
-                $ref: '#/components/schemas/Submodule'
+                $ref: '#/components/schemas/Link'
     '400':
       description: Bad request.
     '500':

@@ -9,6 +9,7 @@ allOf:
         required:
           - user_id
           - module
+          - submodule
         properties:
           user_id:
             type: integer
@@ -27,3 +28,7 @@ allOf:
             type: string
             description: module name
             example: gitlab
+          submodule:
+            type: string
+            description: submodule name
+            example: test_acs/gitlab

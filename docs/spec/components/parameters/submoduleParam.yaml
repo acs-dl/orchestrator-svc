@@ -1,7 +1,7 @@
 name: 'filter[submodule]'
 in: query
-description: The submodules of module, it's a string joined by space character " "
+description: The submodules of module.
 required: false
 schema:
   type: string
-  example: "distributed_lab/acs test_acs"
+  example: "distributed_lab/acs"

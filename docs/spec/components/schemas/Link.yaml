@@ -17,4 +17,4 @@ allOf:
           is_exists:
             type: boolean
             description: flag to indicate whether link exists or not
-            example: true
+            example: "true"
