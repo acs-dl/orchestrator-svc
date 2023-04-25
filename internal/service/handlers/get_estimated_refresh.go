@@ -83,6 +83,13 @@ func getEstimatedRefreshModuleSubmodules(modulesQ data.ModuleQ, moduleName, auth
 		return nil, errors.Wrap(err, "failed to make refresh request")
 	}
 
+	roundedTime, err := helpers.RoundDuration(estimatedTime.Data.Attributes.EstimatedTime)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to round duration")
+	}
+
+	estimatedTime.Data.Attributes.EstimatedTime = roundedTime.String()
+
 	return estimatedTime, nil
 }
 
@@ -106,6 +113,13 @@ func getEstimatedRefreshModule(modulesQ data.ModuleQ, moduleName, authHeader str
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to make refresh request")
 	}
+
+	roundedTime, err := helpers.RoundDuration(estimatedTime.Data.Attributes.EstimatedTime)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to round duration")
+	}
+
+	estimatedTime.Data.Attributes.EstimatedTime = roundedTime.String()
 
 	return estimatedTime, nil
 }
@@ -132,6 +146,11 @@ func getEstimatedRefreshModules(modulesQ data.ModuleQ, authHeader string) (*reso
 		estimatedTime, err = helpers.SumStringDurationWithDuration(moduleEstimatedTime.Data.Attributes.EstimatedTime, estimatedTime)
 		if err != nil {
 			return nil, errors.Wrap(err, "failed to summarize duration")
+		}
+
+		estimatedTime, err = helpers.RoundDuration(estimatedTime.String())
+		if err != nil {
+			return nil, errors.Wrap(err, "failed to round duration")
 		}
 	}
 
