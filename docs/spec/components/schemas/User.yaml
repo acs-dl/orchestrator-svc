@@ -10,6 +10,7 @@ allOf:
           - user_id
           - module
           - submodule
+          - access_level
         properties:
           user_id:
             type: integer
@@ -32,3 +33,7 @@ allOf:
             type: string
             description: submodule name
             example: test_acs/gitlab
+          access_level:
+            type: string
+            description: submodule access level
+            example: "push"

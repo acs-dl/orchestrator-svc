@@ -5,6 +5,8 @@
 package resources
 
 type UserAttributes struct {
+	// submodule access level
+	AccessLevel string `json:"access_level"`
 	// module name
 	Module string `json:"module"`
 	// phone from module
