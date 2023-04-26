@@ -1,21 +1,24 @@
 package helpers
 
 import (
-	"fmt"
+	"bytes"
 	"net/http"
 
+	"gitlab.com/distributed_lab/acs/orchestrator/internal/data"
 	"gitlab.com/distributed_lab/logan/v3/errors"
 )
 
-func MakeDeleteUserRequest(moduleLink, userId, authHeader string) error {
-	link := fmt.Sprintf(moduleLink+"/users/%s", userId)
-	req, err := http.NewRequest(http.MethodDelete, link, nil)
+func MakeNoResponseRequest(params data.RequestParams) error {
+	req, err := http.NewRequest(params.Method, params.Link, bytes.NewReader(params.Body))
 	if err != nil {
 		return errors.Wrap(err, "couldn't create request")
 	}
 
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", authHeader)
+
+	if params.AuthHeader != nil {
+		req.Header.Set("Authorization", *params.AuthHeader)
+	}
 
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
@@ -23,7 +26,7 @@ func MakeDeleteUserRequest(moduleLink, userId, authHeader string) error {
 	}
 
 	if res.StatusCode < 200 || res.StatusCode >= 300 {
-		return errors.New(fmt.Sprintf("error in response, status %s", res.Status))
+		return errors.Errorf("error in response, status %s", res.Status)
 	}
 
 	return nil

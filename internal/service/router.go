@@ -40,6 +40,11 @@ func (s *service) router() chi.Router {
 			r.Get("/status", handlers.CheckHealthStatus)
 		})
 
+		r.With(auth.Jwt(s.jwt.Secret, "orchestrator", []string{"read", "write"}...)).
+			Post("/estimate_refresh", handlers.GetEstimatedRefreshTime)
+		r.With(auth.Jwt(s.jwt.Secret, "orchestrator", []string{"write"}...)).
+			Post("/refresh", handlers.Refresh)
+
 		r.Route("/modules", func(r chi.Router) {
 			r.Post("/", handlers.RegisterModule)           // comes from modules
 			r.Delete("/{name}", handlers.UnregisterModule) // comes from modules
@@ -54,6 +59,9 @@ func (s *service) router() chi.Router {
 		r.With(auth.Jwt(s.jwt.Secret, "orchestrator", []string{"read", "write"}...)).
 			Get("/roles", handlers.GetRoles)
 
+		r.With(auth.Jwt(s.jwt.Secret, "orchestrator", []string{"read", "write"}...)).
+			Get("/submodule", handlers.CheckSubmodule)
+
 		r.Route("/requests", func(r chi.Router) {
 			r.With(auth.Jwt(s.jwt.Secret, "orchestrator", []string{"write"}...)).
 				Post("/", handlers.CreateRequest)
@@ -62,6 +70,7 @@ func (s *service) router() chi.Router {
 			r.With(auth.Jwt(s.jwt.Secret, "orchestrator", []string{"read", "write"}...)).
 				Get("/{id}", handlers.GetRequest)
 		})
+
 		r.Route("/users", func(r chi.Router) {
 			r.With(auth.Jwt(s.jwt.Secret, "orchestrator", []string{"read", "write"}...)).
 				Get("/{id}", handlers.GetUserById)

@@ -1,0 +1,7 @@
+name: 'filter[submodule]'
+in: query
+description: The submodules of module.
+required: false
+schema:
+  type: string
+  example: "distributed_lab/acs"

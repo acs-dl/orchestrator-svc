@@ -1,0 +1,22 @@
+post:
+  tags:
+    - Refresh
+  summary: Refresh
+  operationId: refresh
+  description: Endpoint for refreshing modules or submodules.
+  requestBody:
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            data:
+              type: object
+              $ref: '#/components/schemas/Refresh'
+  responses:
+    '202':
+      description: Accepted
+    '400':
+      description: Bad request.
+    '500':
+      description: Internal server error.
