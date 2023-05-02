@@ -1,9 +1,7 @@
 package helpers
 
 import (
-	"bytes"
 	"encoding/json"
-	"net/http"
 
 	"gitlab.com/distributed_lab/acs/orchestrator/internal/data"
 	"gitlab.com/distributed_lab/acs/orchestrator/resources"
@@ -11,37 +9,22 @@ import (
 )
 
 func MakeGetEstimatedTimeRequest(params data.RequestParams) (*resources.EstimatedTimeResponse, error) {
-	req, err := http.NewRequest(params.Method, params.Link, bytes.NewReader(params.Body))
+	res, err := MakeHttpRequest(params)
 	if err != nil {
-		return nil, errors.Wrap(err, "couldn't create request")
+		return nil, errors.Wrap(err, "failed to make http request")
 	}
 
-	req.Header.Set("Content-Type", "application/json")
-
-	if params.AuthHeader != nil {
-		req.Header.Set("Authorization", *params.AuthHeader)
-	}
-
-	if params.Query != nil {
-		q := req.URL.Query()
-		for key, value := range params.Query {
-			q.Add(key, value)
-		}
-		req.URL.RawQuery = q.Encode()
-	}
-
-	res, err := http.DefaultClient.Do(req)
+	res, err = HandleHttpResponseStatusCode(res, params)
 	if err != nil {
-		return nil, errors.Wrap(err, "error making http request")
+		return nil, errors.Wrap(err, "failed to check response status code")
 	}
-
-	if res.StatusCode < 200 || res.StatusCode >= 300 {
-		return nil, errors.Errorf("error in response, status %s", res.Status)
+	if res == nil {
+		return nil, errors.Wrap(err, "estimated time wasn't found")
 	}
 
 	var response resources.EstimatedTimeResponse
 	if err = json.NewDecoder(res.Body).Decode(&response); err != nil {
-		return nil, errors.Wrap(err, " failed to unmarshal body")
+		return nil, errors.Wrap(err, "failed to unmarshal body")
 	}
 
 	return &response, nil

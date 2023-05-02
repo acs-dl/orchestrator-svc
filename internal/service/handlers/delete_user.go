@@ -167,11 +167,15 @@ func checkIdentityRegisteredAndMakeDeleteUserRequest(moduleQ data.ModuleQ, userI
 	}
 
 	err = helpers.MakeNoResponseRequest(data.RequestParams{
-		Method:     http.MethodDelete,
-		Link:       module.Link + "/users/" + userId,
-		AuthHeader: &authHeader,
-		Body:       nil,
-		Query:      nil,
+		Method: http.MethodDelete,
+		Link:   module.Link + "/users/" + userId,
+		Header: map[string]string{
+			"Authorization": authHeader,
+			"Content-Type":  "application/json",
+		},
+		Body:    nil,
+		Query:   nil,
+		Timeout: 30 * time.Second,
 	})
 	if err != nil {
 		return errors.Wrap(err, "failed to make delete user request")
