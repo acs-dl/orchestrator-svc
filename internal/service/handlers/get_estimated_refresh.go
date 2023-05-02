@@ -67,7 +67,7 @@ func getEstimatedRefreshModuleSubmodules(modulesQ data.ModuleQ, moduleName, auth
 		return nil, errors.New("no such module")
 	}
 
-	body, err := createJsonSubmodulesBody(submodules)
+	body, err := helpers.CreateJsonSubmodulesBody(submodules)
 	if err != nil {
 		return nil, err
 	}
