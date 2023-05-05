@@ -2,42 +2,11 @@ package helpers
 
 import (
 	"encoding/json"
-	"fmt"
-	"net/http"
-	"time"
 
 	"gitlab.com/distributed_lab/acs/orchestrator/internal/data"
 	"gitlab.com/distributed_lab/acs/orchestrator/resources"
 	"gitlab.com/distributed_lab/logan/v3/errors"
 )
-
-func MakeGetUserRequest(moduleLink, userId string, counter int64) (*resources.User, error) {
-	params := data.RequestParams{
-		Method: http.MethodGet,
-		Link:   fmt.Sprintf(moduleLink+"/users/%s", userId),
-		Header: map[string]string{
-			"Content-Type": "application/json",
-		},
-		Body:    nil,
-		Query:   nil,
-		Timeout: 30 * time.Second,
-	}
-
-	res, err := MakeHttpRequest(params)
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to make http request")
-	}
-
-	res, err = HandleHttpResponseStatusCode(res, params)
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to check response status code")
-	}
-	if res == nil {
-		return nil, nil
-	}
-
-	return populateGetUserResponse(res, counter)
-}
 
 func populateGetUserResponse(res *data.ResponseParams, counter int64) (*resources.User, error) {
 	response := struct {

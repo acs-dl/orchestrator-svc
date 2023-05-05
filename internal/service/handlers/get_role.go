@@ -1,16 +1,14 @@
 package handlers
 
 import (
-	"encoding/json"
-	"fmt"
 	"net/http"
+	"time"
 
+	"gitlab.com/distributed_lab/acs/orchestrator/internal/data"
 	"gitlab.com/distributed_lab/acs/orchestrator/internal/service/helpers"
 	"gitlab.com/distributed_lab/acs/orchestrator/internal/service/requests"
-	"gitlab.com/distributed_lab/acs/orchestrator/resources"
 	"gitlab.com/distributed_lab/ape"
 	"gitlab.com/distributed_lab/ape/problems"
-	"gitlab.com/distributed_lab/logan/v3/errors"
 )
 
 func GetRole(w http.ResponseWriter, r *http.Request) {
@@ -40,7 +38,18 @@ func GetRole(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	roleResponse, err := makeGetRoleRequest(module.Link, *request.AccessLevel)
+	roleResponse, err := helpers.MakeGetRoleRequest(data.RequestParams{
+		Method: http.MethodGet,
+		Link:   module.Link + "/role",
+		Body:   nil,
+		Header: map[string]string{
+			"Content-Type": "application/json",
+		},
+		Query: map[string]string{
+			"filter[accessLevel]": *request.AccessLevel,
+		},
+		Timeout: 30 * time.Second,
+	})
 	if err != nil {
 		helpers.Log(r).WithError(err).Infof("failed to get role `%s` from module `%s`", *request.AccessLevel, *request.ModuleName)
 		ape.RenderErr(w, problems.InternalError())
@@ -54,39 +63,4 @@ func GetRole(w http.ResponseWriter, r *http.Request) {
 	}
 
 	ape.Render(w, roleResponse)
-}
-
-func makeGetRoleRequest(moduleLink, accessLevel string) (*resources.RoleResponse, error) {
-	link := fmt.Sprintf(moduleLink + "/role")
-	req, err := http.NewRequest(http.MethodGet, link, nil)
-	if err != nil {
-		return nil, errors.Wrap(err, "couldn't create request")
-	}
-
-	req.Header.Set("Content-Type", "application/json")
-
-	q := req.URL.Query()
-	q.Add("filter[accessLevel]", accessLevel)
-	req.URL.RawQuery = q.Encode()
-
-	res, err := http.DefaultClient.Do(req)
-	if err != nil {
-		return nil, errors.Wrap(err, "error making http request")
-	}
-
-	if res.StatusCode == 404 {
-		return nil, nil
-	}
-
-	if res.StatusCode < 200 || res.StatusCode >= 300 {
-		return nil, errors.New(fmt.Sprintf("error in response, status %s", res.Status))
-	}
-
-	var returned resources.RoleResponse
-
-	if err := json.NewDecoder(res.Body).Decode(&returned); err != nil {
-		return nil, errors.Wrap(err, " failed to unmarshal body")
-	}
-
-	return &returned, nil
 }

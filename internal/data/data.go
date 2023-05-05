@@ -9,6 +9,8 @@ import (
 )
 
 const (
+	AuthService = "auth"
+
 	ModuleName         = "orchestrator"
 	RemoveModuleAction = "remove_module"
 	DeleteUserAction   = "delete_user"

@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
 	"time"
@@ -45,16 +46,25 @@ func DeleteUserById(w http.ResponseWriter, r *http.Request) {
 
 	var userinfoModules = make([]resources.User, 0)
 	for i, module := range modules {
-		returned, err := helpers.MakeGetUserRequest(module.Link, request.Id, int64(i))
+		response, err := helpers.MakeGetUserRequest(data.RequestParams{
+			Method: http.MethodGet,
+			Link:   fmt.Sprintf(module.Link+"/users/%s", userId),
+			Header: map[string]string{
+				"Content-Type": "application/json",
+			},
+			Body:    nil,
+			Query:   nil,
+			Timeout: 30 * time.Second,
+		}, int64(i))
 		if err != nil {
 			helpers.Log(r).WithError(err).Errorf("failed to get user with id `%s` from module `%s`", request.Id, module.Name)
 			ape.RenderErr(w, problems.InternalError())
 			return
 		}
-		if returned == nil {
+		if response == nil {
 			continue
 		}
-		userinfoModules = append(userinfoModules, *returned)
+		userinfoModules = append(userinfoModules, *response)
 	}
 
 	requestToCheck := make([]string, 0)
