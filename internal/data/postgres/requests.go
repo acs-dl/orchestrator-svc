@@ -3,6 +3,7 @@ package postgres
 import (
 	"database/sql"
 	"fmt"
+
 	sq "github.com/Masterminds/squirrel"
 	"github.com/fatih/structs"
 	"github.com/pkg/errors"
@@ -125,7 +126,7 @@ func (r requestsQ) GetTotalCount() (int64, error) {
 }
 
 func (r requestsQ) Page(pageParams pgdb.OffsetPageParams) data.RequestQ {
-	r.selectBuilder = pageParams.ApplyTo(r.selectBuilder, "id")
+	r.selectBuilder = pageParams.ApplyTo(r.selectBuilder, "created_at")
 
 	return r
 }
