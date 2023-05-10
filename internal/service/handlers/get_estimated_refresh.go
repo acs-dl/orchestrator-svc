@@ -91,7 +91,7 @@ func getEstimatedRefreshModuleSubmodules(modulesQ data.ModuleQ, moduleName, auth
 		return nil, errors.Wrap(err, "failed to round duration")
 	}
 
-	estimatedTime.Data.Attributes.EstimatedTime = roundedTime.String()
+	estimatedTime.Data.Attributes.EstimatedTime = (roundedTime + (1 * time.Minute)).String()
 
 	return estimatedTime, nil
 }
@@ -125,7 +125,7 @@ func getEstimatedRefreshModule(modulesQ data.ModuleQ, moduleName, authHeader str
 		return nil, errors.Wrap(err, "failed to round duration")
 	}
 
-	estimatedTime.Data.Attributes.EstimatedTime = roundedTime.String()
+	estimatedTime.Data.Attributes.EstimatedTime = (roundedTime + (1 * time.Minute)).String()
 
 	return estimatedTime, nil
 }
@@ -163,7 +163,7 @@ func getEstimatedRefreshModules(modulesQ data.ModuleQ, authHeader string) (*reso
 		}
 	}
 
-	response := NewEstimatedTimeResponse(estimatedTime.String())
+	response := NewEstimatedTimeResponse((estimatedTime + (1 * time.Minute)).String())
 	return &response, nil
 }
 

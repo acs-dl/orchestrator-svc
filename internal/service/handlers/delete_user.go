@@ -25,9 +25,16 @@ func DeleteUserById(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userId, err := strconv.ParseInt(request.Id, 10, 64)
+	userId, err := strconv.ParseInt(request.Data.Attributes.ToUser, 10, 64)
 	if err != nil {
-		helpers.Log(r).WithError(err).Errorf("failed to parse user id `%s`", request.Id)
+		helpers.Log(r).WithError(err).Errorf("failed to parse to user id `%s`", request.Data.Attributes.ToUser)
+		ape.RenderErr(w, problems.BadRequest(err)...)
+		return
+	}
+
+	fromUserId, err := strconv.ParseInt(request.Data.Attributes.ToUser, 10, 64)
+	if err != nil {
+		helpers.Log(r).WithError(err).Errorf("failed to parse from user id `%s`", request.Data.Attributes.FromUser)
 		ape.RenderErr(w, problems.BadRequest(err)...)
 		return
 	}
@@ -57,7 +64,7 @@ func DeleteUserById(w http.ResponseWriter, r *http.Request) {
 			Timeout: 30 * time.Second,
 		}, int64(i))
 		if err != nil {
-			helpers.Log(r).WithError(err).Errorf("failed to get user with id `%s` from module `%s`", request.Id, module.Name)
+			helpers.Log(r).WithError(err).Errorf("failed to get user with id `%s` from module `%s`", request.Data.Attributes.ToUser, module.Name)
 			ape.RenderErr(w, problems.InternalError())
 			return
 		}
@@ -95,7 +102,7 @@ func DeleteUserById(w http.ResponseWriter, r *http.Request) {
 
 		requestData := data.Request{
 			ID:         uuid.New().String(),
-			FromUserID: *request.FromUserId,
+			FromUserID: fromUserId,
 			ToUserID:   userId,
 			Payload:    deleteUserJson,
 			ModuleName: module.Name,
@@ -113,6 +120,8 @@ func DeleteUserById(w http.ResponseWriter, r *http.Request) {
 		helpers.Log(r).Infof("successfully created request with id `%s`", requestData.ID)
 	}
 
+	//requestToCheck - array with request ids for deleting user from modules
+
 	err = waitForRequestsToHandleInModules(r, requestToCheck)
 	if err != nil {
 		helpers.Log(r).WithError(err).Error("failed to wait request handling")
@@ -120,14 +129,14 @@ func DeleteUserById(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = checkIdentityRegisteredAndMakeDeleteUserRequest(helpers.ModulesQ(r), request.Id, r.Header.Get("Authorization"))
+	err = checkIdentityRegisteredAndMakeDeleteUserRequest(helpers.ModulesQ(r), request.Data.Attributes.ToUser, r.Header.Get("Authorization"))
 	if err != nil {
 		helpers.Log(r).WithError(err).Error("failed to check identity and make delete request")
 		ape.RenderErr(w, problems.InternalError())
 		return
 	}
 
-	helpers.Log(r).Infof("successfully created requests to delete user with id `%s` from modules", request.Id)
+	helpers.Log(r).Infof("successfully created requests to delete user with id `%s` from modules", request.Data.Attributes.ToUser)
 	ape.Render(w, http.StatusAccepted)
 }
 
