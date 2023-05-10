@@ -1,7 +1,7 @@
 -- +migrate Up
 
 create type request_status_enum as enum ('pending', 'in progress', 'success', 'invited', 'failed');
-create type transaction_action_enum as enum ('delete_user');
+create type transaction_action_enum as enum ('single','delete_user');
 
 create table if not exists modules (
     name text primary key,
@@ -30,7 +30,7 @@ create index requests_payload_action_ids on requests ((payload ->> 'action'));
 create table if not exists request_transactions(
     id uuid primary key,
     action transaction_action_enum not null,
-    requests jsonb not null --map[uuid]:bool - to check whether request was handled
+    requests jsonb not null  --map[uuid]:bool - to check whether request was handled
 );
 
 -- +migrate Down
@@ -40,3 +40,4 @@ drop index if exists requests_payload_action_ids;
 drop table if exists requests;
 drop table if exists modules;
 drop type if exists request_status_enum;
+drop type if exists transaction_action_enum;

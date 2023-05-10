@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"database/sql"
+	"fmt"
 
 	sq "github.com/Masterminds/squirrel"
 	"github.com/fatih/structs"
@@ -21,7 +22,7 @@ type RequestTransactionsQ struct {
 func NewRequestTransactionsQ(db *pgdb.DB) data.RequestTransactions {
 	return &RequestTransactionsQ{
 		db:            db,
-		selectBuilder: sq.Select(requestTransactionsTable + ".*").From(requestTransactionsTable),
+		selectBuilder: sq.Select("*").From(requestTransactionsTable),
 		updateBuilder: sq.Update(requestTransactionsTable),
 		deleteBuilder: sq.Delete(requestTransactionsTable),
 	}
@@ -32,7 +33,15 @@ func (r RequestTransactionsQ) New() data.RequestTransactions {
 }
 
 func (r RequestTransactionsQ) FilterByIDs(ids ...string) data.RequestTransactions {
-	stmt := sq.Eq{requestsTable + ".id": ids}
+	stmt := sq.Eq{requestTransactionsTable + ".id": ids}
+	r.selectBuilder = r.selectBuilder.Where(stmt)
+	r.updateBuilder = r.updateBuilder.Where(stmt)
+	r.deleteBuilder = r.deleteBuilder.Where(stmt)
+	return r
+}
+
+func (r RequestTransactionsQ) FilterByRequestID(id string) data.RequestTransactions {
+	stmt := sq.NotEq{fmt.Sprintf("requests->'%s'", id): nil}
 	r.selectBuilder = r.selectBuilder.Where(stmt)
 	r.updateBuilder = r.updateBuilder.Where(stmt)
 	r.deleteBuilder = r.deleteBuilder.Where(stmt)
@@ -41,6 +50,7 @@ func (r RequestTransactionsQ) FilterByIDs(ids ...string) data.RequestTransaction
 
 func (r RequestTransactionsQ) Get() (*data.RequestTransaction, error) {
 	var result data.RequestTransaction
+	fmt.Println(r.selectBuilder.MustSql())
 	err := r.db.Get(&result, r.selectBuilder)
 	if err == sql.ErrNoRows {
 		return nil, nil

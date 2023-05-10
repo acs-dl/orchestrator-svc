@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"encoding/json"
 	"net/http"
 	"strconv"
 
@@ -65,6 +66,23 @@ func RefreshAllModules(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		helpers.Log(r).Infof("successfully created refresh request with id `%s`", requestData.ID)
+
+		marshalledRequests, err := json.Marshal(map[string]bool{requestData.ID: false})
+		if err != nil {
+			helpers.Log(r).WithError(err).Error("failed to marshal requests")
+			ape.RenderErr(w, problems.InternalError())
+			return
+		}
+		err = helpers.RequestTransactionsQ(r).Insert(data.RequestTransaction{
+			ID:       uuid.New().String(),
+			Action:   data.Single,
+			Requests: marshalledRequests,
+		})
+		if err != nil {
+			helpers.Log(r).WithError(err).Error("failed to save new request transaction")
+			ape.RenderErr(w, problems.InternalError())
+			return
+		}
 	}
 
 	helpers.Log(r).Infof("successfully created requests to refresh all")

@@ -16,15 +16,16 @@ import (
 )
 
 type service struct {
-	log        *logan.Entry
-	copus      types.Copus
-	listener   net.Listener
-	modulesQ   data.ModuleQ
-	requestsQ  data.RequestQ
-	publisher  *amqp.Publisher
-	subscriber *amqp.Subscriber
-	jwt        *config.JwtCfg
-	rawDB      *sql.DB
+	log                  *logan.Entry
+	copus                types.Copus
+	listener             net.Listener
+	modulesQ             data.ModuleQ
+	requestsQ            data.RequestQ
+	requestTransactionsQ data.RequestTransactions
+	publisher            *amqp.Publisher
+	subscriber           *amqp.Subscriber
+	jwt                  *config.JwtCfg
+	rawDB                *sql.DB
 }
 
 func (s *service) run() error {
@@ -40,15 +41,16 @@ func (s *service) run() error {
 
 func newService(cfg config.Config) *service {
 	return &service{
-		log:        cfg.Log(),
-		copus:      cfg.Copus(),
-		listener:   cfg.Listener(),
-		modulesQ:   postgres.NewModuleQ(cfg.DB().Clone()),
-		requestsQ:  postgres.NewRequestsQ(cfg.DB().Clone()),
-		publisher:  cfg.Publisher(),
-		subscriber: cfg.Subscriber(),
-		jwt:        cfg.JwtParams(),
-		rawDB:      cfg.RawDB(),
+		log:                  cfg.Log(),
+		copus:                cfg.Copus(),
+		listener:             cfg.Listener(),
+		modulesQ:             postgres.NewModuleQ(cfg.DB().Clone()),
+		requestsQ:            postgres.NewRequestsQ(cfg.DB().Clone()),
+		requestTransactionsQ: postgres.NewRequestTransactionsQ(cfg.DB().Clone()),
+		publisher:            cfg.Publisher(),
+		subscriber:           cfg.Subscriber(),
+		jwt:                  cfg.JwtParams(),
+		rawDB:                cfg.RawDB(),
 	}
 }
 
