@@ -44,8 +44,8 @@ func (s *service) router() chi.Router {
 		r.With(auth.Jwt(s.jwt.Secret, "orchestrator", []string{"read", "write"}...)).
 			Post("/estimate_refresh", handlers.GetEstimatedRefreshTime)
 
-		//r.With(auth.Jwt(s.jwt.Secret, "orchestrator", []string{"write"}...)).
-		r.Post("/refresh", handlers.RefreshAllModules)
+		r.With(auth.Jwt(s.jwt.Secret, "orchestrator", []string{"write"}...)).
+			Post("/refresh", handlers.RefreshAllModules)
 
 		r.Route("/modules", func(r chi.Router) {
 			r.Post("/", handlers.RegisterModule)           // comes from modules
