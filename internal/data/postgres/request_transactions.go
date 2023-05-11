@@ -5,8 +5,8 @@ import (
 	"fmt"
 
 	sq "github.com/Masterminds/squirrel"
+	"github.com/acs-dl/orchestrator-svc/internal/data"
 	"github.com/fatih/structs"
-	"gitlab.com/distributed_lab/acs/orchestrator/internal/data"
 	"gitlab.com/distributed_lab/kit/pgdb"
 )
 

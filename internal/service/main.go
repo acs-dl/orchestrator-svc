@@ -2,16 +2,16 @@ package service
 
 import (
 	"database/sql"
+	"gitlab.com/distributed_lab/logan/v3"
 	"net"
 	"net/http"
 
 	"github.com/ThreeDotsLabs/watermill-amqp/v2/pkg/amqp"
-	"gitlab.com/distributed_lab/acs/orchestrator/internal/data"
-	"gitlab.com/distributed_lab/acs/orchestrator/internal/data/postgres"
+	"github.com/acs-dl/orchestrator-svc/internal/data"
+	"github.com/acs-dl/orchestrator-svc/internal/data/postgres"
 
-	"gitlab.com/distributed_lab/acs/orchestrator/internal/config"
+	"github.com/acs-dl/orchestrator-svc/internal/config"
 	"gitlab.com/distributed_lab/kit/copus/types"
-	"gitlab.com/distributed_lab/logan/v3"
 	"gitlab.com/distributed_lab/logan/v3/errors"
 )
 

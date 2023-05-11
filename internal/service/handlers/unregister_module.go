@@ -4,10 +4,10 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/acs-dl/orchestrator-svc/internal/data"
+	"github.com/acs-dl/orchestrator-svc/internal/service/helpers"
+	"github.com/acs-dl/orchestrator-svc/internal/service/requests"
 	"github.com/google/uuid"
-	"gitlab.com/distributed_lab/acs/orchestrator/internal/data"
-	"gitlab.com/distributed_lab/acs/orchestrator/internal/service/helpers"
-	"gitlab.com/distributed_lab/acs/orchestrator/internal/service/requests"
 	"gitlab.com/distributed_lab/ape"
 	"gitlab.com/distributed_lab/ape/problems"
 )

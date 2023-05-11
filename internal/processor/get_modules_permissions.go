@@ -5,9 +5,9 @@ import (
 	"net/http"
 	"time"
 
-	"gitlab.com/distributed_lab/acs/orchestrator/internal/data"
-	"gitlab.com/distributed_lab/acs/orchestrator/internal/service/helpers"
-	"gitlab.com/distributed_lab/acs/orchestrator/internal/types"
+	"github.com/acs-dl/orchestrator-svc/internal/data"
+	"github.com/acs-dl/orchestrator-svc/internal/service/helpers"
+	"github.com/acs-dl/orchestrator-svc/internal/types"
 	"gitlab.com/distributed_lab/logan/v3/errors"
 )
 

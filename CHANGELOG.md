@@ -42,5 +42,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 
-[1.0.0]: https://gitlab.com/distributed_lab/acs/orchestrator/-/tree/feature/requests_action_filter
-[1.0.1]: https://gitlab.com/distributed_lab/acs/orchestrator/compare/feature/requests_action_filter...feature/auth_permissions
+[1.0.0]: https://github.com/acs-dl/orchestrator-svc/-/tree/feature/requests_action_filter
+[1.0.1]: https://github.com/acs-dl/orchestrator-svc/compare/feature/requests_action_filter...feature/auth_permissions

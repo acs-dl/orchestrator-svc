@@ -3,13 +3,12 @@ package helpers
 import (
 	"context"
 	"database/sql"
+	"gitlab.com/distributed_lab/logan/v3"
 	"net/http"
 
 	"github.com/ThreeDotsLabs/watermill-amqp/v2/pkg/amqp"
-	"gitlab.com/distributed_lab/acs/orchestrator/internal/data"
-	"gitlab.com/distributed_lab/acs/orchestrator/internal/sender"
-
-	"gitlab.com/distributed_lab/logan/v3"
+	"github.com/acs-dl/orchestrator-svc/internal/data"
+	"github.com/acs-dl/orchestrator-svc/internal/sender"
 )
 
 type ctxKey int

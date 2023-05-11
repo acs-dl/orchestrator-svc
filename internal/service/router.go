@@ -3,12 +3,12 @@ package service
 import (
 	"context"
 
+	auth "github.com/acs-dl/auth-svc/middlewares"
+	"github.com/acs-dl/orchestrator-svc/internal/receiver"
+	"github.com/acs-dl/orchestrator-svc/internal/sender"
+	"github.com/acs-dl/orchestrator-svc/internal/service/handlers"
+	"github.com/acs-dl/orchestrator-svc/internal/service/helpers"
 	"github.com/go-chi/chi"
-	auth "gitlab.com/distributed_lab/acs/auth/middlewares"
-	"gitlab.com/distributed_lab/acs/orchestrator/internal/receiver"
-	"gitlab.com/distributed_lab/acs/orchestrator/internal/sender"
-	"gitlab.com/distributed_lab/acs/orchestrator/internal/service/handlers"
-	"gitlab.com/distributed_lab/acs/orchestrator/internal/service/helpers"
 	"gitlab.com/distributed_lab/ape"
 )
 

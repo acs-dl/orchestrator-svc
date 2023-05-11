@@ -2,8 +2,8 @@ package requests
 
 import (
 	"encoding/json"
+	"github.com/acs-dl/orchestrator-svc/resources"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
-	"gitlab.com/distributed_lab/acs/orchestrator/resources"
 	"net/http"
 )
 

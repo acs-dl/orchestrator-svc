@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"time"
 
-	"gitlab.com/distributed_lab/acs/orchestrator/resources"
+	"github.com/acs-dl/orchestrator-svc/resources"
 )
 
 const (

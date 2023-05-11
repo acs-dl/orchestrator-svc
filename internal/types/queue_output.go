@@ -1,6 +1,6 @@
 package types
 
-import "gitlab.com/distributed_lab/acs/orchestrator/internal/data"
+import "github.com/acs-dl/orchestrator-svc/internal/data"
 
 type ModuleResult string
 

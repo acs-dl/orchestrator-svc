@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"gitlab.com/distributed_lab/acs/orchestrator/resources"
+	"github.com/acs-dl/orchestrator-svc/resources"
 	"gitlab.com/distributed_lab/logan/v3/errors"
 )
 

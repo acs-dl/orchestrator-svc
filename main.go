@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 
-	"gitlab.com/distributed_lab/acs/orchestrator/internal/cli"
+	"github.com/acs-dl/orchestrator-svc/internal/cli"
 )
 
 func main() {

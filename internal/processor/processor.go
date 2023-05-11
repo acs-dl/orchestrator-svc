@@ -1,10 +1,10 @@
 package processor
 
 import (
+	"github.com/acs-dl/orchestrator-svc/internal/data"
+	"github.com/acs-dl/orchestrator-svc/internal/sender"
+	"github.com/acs-dl/orchestrator-svc/internal/types"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
-	"gitlab.com/distributed_lab/acs/orchestrator/internal/data"
-	"gitlab.com/distributed_lab/acs/orchestrator/internal/sender"
-	"gitlab.com/distributed_lab/acs/orchestrator/internal/types"
 	"gitlab.com/distributed_lab/logan/v3"
 	"gitlab.com/distributed_lab/logan/v3/errors"
 )

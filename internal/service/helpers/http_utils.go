@@ -7,7 +7,7 @@ import (
 	"io"
 	"net/http"
 
-	"gitlab.com/distributed_lab/acs/orchestrator/internal/data"
+	"github.com/acs-dl/orchestrator-svc/internal/data"
 	"gitlab.com/distributed_lab/logan/v3/errors"
 )
 

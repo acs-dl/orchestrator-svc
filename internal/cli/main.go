@@ -1,9 +1,9 @@
 package cli
 
 import (
+	"github.com/acs-dl/orchestrator-svc/internal/config"
+	"github.com/acs-dl/orchestrator-svc/internal/service"
 	"github.com/alecthomas/kingpin"
-	"gitlab.com/distributed_lab/acs/orchestrator/internal/config"
-	"gitlab.com/distributed_lab/acs/orchestrator/internal/service"
 	"gitlab.com/distributed_lab/kit/kv"
 	"gitlab.com/distributed_lab/logan/v3"
 )

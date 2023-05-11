@@ -2,13 +2,13 @@ package sender
 
 import (
 	"context"
+	"gitlab.com/distributed_lab/logan/v3"
 	"time"
 
 	"github.com/ThreeDotsLabs/watermill-amqp/v2/pkg/amqp"
 	"github.com/ThreeDotsLabs/watermill/message"
+	"github.com/acs-dl/orchestrator-svc/internal/data"
 	"github.com/pkg/errors"
-	"gitlab.com/distributed_lab/acs/orchestrator/internal/data"
-	"gitlab.com/distributed_lab/logan/v3"
 	"gitlab.com/distributed_lab/running"
 )
 

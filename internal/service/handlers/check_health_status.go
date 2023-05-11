@@ -3,7 +3,7 @@ package handlers
 import (
 	"net/http"
 
-	"gitlab.com/distributed_lab/acs/orchestrator/internal/service/helpers"
+	"github.com/acs-dl/orchestrator-svc/internal/service/helpers"
 	"gitlab.com/distributed_lab/ape"
 )
 

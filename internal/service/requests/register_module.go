@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/acs-dl/orchestrator-svc/resources"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
-	"gitlab.com/distributed_lab/acs/orchestrator/resources"
 )
 
 type RegisterModuleRequest struct {
