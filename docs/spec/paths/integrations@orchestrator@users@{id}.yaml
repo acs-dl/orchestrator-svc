@@ -21,9 +21,29 @@ delete:
   tags: [ Users ]
   summary: Delete user by id
   operationId: deleteUserById
-  parameters:
-    - $ref: '#/components/parameters/userIdParam'
-    - $ref: '#/components/parameters/fromUserIdParam'
+  requestBody:
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            data:
+              type: object
+              properties:
+                attributes:
+                  type: object
+                  required:
+                    - from_user
+                    - to_user
+                  properties:
+                    from_user:
+                      type: string
+                      description: user's id who send request
+                      example: "1"
+                    to_user:
+                      type: string
+                      description: user's id for who request was sent
+                      example: "2"
   responses:
     '202':
       description: Accepted

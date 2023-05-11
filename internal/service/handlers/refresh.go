@@ -3,156 +3,89 @@ package handlers
 import (
 	"encoding/json"
 	"net/http"
+	"strconv"
 
-	"github.com/pkg/errors"
+	"github.com/google/uuid"
 	"gitlab.com/distributed_lab/acs/orchestrator/internal/data"
 	"gitlab.com/distributed_lab/acs/orchestrator/internal/service/helpers"
 	"gitlab.com/distributed_lab/acs/orchestrator/internal/service/requests"
-	"gitlab.com/distributed_lab/acs/orchestrator/resources"
 	"gitlab.com/distributed_lab/ape"
 	"gitlab.com/distributed_lab/ape/problems"
 )
 
-func Refresh(w http.ResponseWriter, r *http.Request) {
-	request, err := requests.NewRefreshRequest(r)
+func RefreshAllModules(w http.ResponseWriter, r *http.Request) {
+	request, err := requests.NewRefreshAllRequest(r)
 	if err != nil {
-		helpers.Log(r).WithError(err).Error("failed to parse request")
+		helpers.Log(r).WithError(err).Error("failed to parse create request")
 		ape.RenderErr(w, problems.BadRequest(err)...)
 		return
 	}
 
-	if request.Data.Attributes.ModuleName == nil {
-		err = refreshModules(helpers.ModulesQ(r), r.Header.Get("Authorization"))
-		if err != nil {
-			helpers.Log(r).WithError(err).Error("failed to refresh modules")
-			ape.RenderErr(w, problems.InternalError())
-			return
-		}
-
-		ape.Render(w, http.StatusAccepted)
+	fromUserId, err := strconv.ParseInt(request.Data.Attributes.FromUser, 10, 64)
+	if err != nil {
+		helpers.Log(r).WithError(err).Errorf("failed to parse from user id `%s`", request.Data.Attributes.FromUser)
+		ape.RenderErr(w, problems.BadRequest(err)...)
 		return
 	}
 
-	if request.Data.Attributes.Submodule == nil {
-		err = refreshModule(helpers.ModulesQ(r), *request.Data.Attributes.ModuleName, r.Header.Get("Authorization"))
-		if err != nil {
-			helpers.Log(r).WithError(err).Error("failed to refresh module")
-			ape.RenderErr(w, problems.InternalError())
-			return
-		}
-
-		ape.Render(w, http.StatusAccepted)
+	toUserId, err := strconv.ParseInt(request.Data.Attributes.ToUser, 10, 64)
+	if err != nil {
+		helpers.Log(r).WithError(err).Errorf("failed to parse to user id `%s`", request.Data.Attributes.ToUser)
+		ape.RenderErr(w, problems.BadRequest(err)...)
 		return
 	}
 
-	err = refreshModuleSubmodules(helpers.ModulesQ(r), *request.Data.Attributes.ModuleName, r.Header.Get("Authorization"), *request.Data.Attributes.Submodule)
+	modules, err := helpers.ModulesQ(r).FilterByIsModule(true).Select()
 	if err != nil {
-		if err != nil {
-			helpers.Log(r).WithError(err).Error("failed to refresh module submodule")
-			ape.RenderErr(w, problems.InternalError())
-			return
-		}
+		helpers.Log(r).WithError(err).Error("failed to select all modules")
+		ape.RenderErr(w, problems.InternalError())
+		return
 	}
 
-	ape.Render(w, http.StatusAccepted)
-}
-
-func createJsonSubmodulesBody(submodules []string) ([]byte, error) {
-	type req struct {
-		Data resources.Submodule `json:"data"`
-	}
-
-	body := resources.Submodule{
-		Key: resources.Key{
-			ID:   string(resources.LINKS),
-			Type: resources.LINKS,
-		},
-		Attributes: resources.SubmoduleAttributes{
-			Links: submodules,
-		},
-	}
-
-	newReq := req{Data: body}
-
-	bodyBytes, err := json.Marshal(newReq)
+	refreshModulePayload, err := helpers.CreateRefreshModulePayload()
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to marshal body")
-	}
-
-	return bodyBytes, nil
-}
-
-func refreshModuleSubmodules(modulesQ data.ModuleQ, moduleName, authHeader string, submodules []string) error {
-	module, err := modulesQ.FilterByNames(moduleName).Get()
-	if err != nil {
-		return errors.Wrap(err, "failed to get module")
-	}
-
-	if module == nil {
-		return errors.New("no such module")
-	}
-
-	body, err := createJsonSubmodulesBody(submodules)
-	if err != nil {
-		return err
-	}
-
-	err = helpers.MakeNoResponseRequest(data.RequestParams{
-		Method:     http.MethodPost,
-		Link:       module.Link + "/refresh/submodule",
-		AuthHeader: &authHeader,
-		Body:       body,
-		Query:      nil,
-	})
-	if err != nil {
-		return errors.Wrap(err, "failed to make refresh request")
-	}
-
-	return nil
-}
-
-func refreshModule(modulesQ data.ModuleQ, moduleName, authHeader string) error {
-	module, err := modulesQ.FilterByNames(moduleName).Get()
-	if err != nil {
-		return errors.Wrap(err, "failed to get module")
-	}
-
-	if module == nil {
-		return errors.New("no such module")
-	}
-
-	err = helpers.MakeNoResponseRequest(data.RequestParams{
-		Method:     http.MethodPost,
-		Link:       module.Link + "/refresh/module",
-		AuthHeader: &authHeader,
-		Body:       nil,
-		Query:      nil,
-	})
-	if err != nil {
-		return errors.Wrap(err, "failed to make refresh request")
-	}
-
-	return nil
-}
-
-func refreshModules(modulesQ data.ModuleQ, authHeader string) error {
-	modules, err := modulesQ.FilterByIsModule(true).Select()
-	if err != nil {
-		return errors.Wrap(err, "failed to select modules")
+		helpers.Log(r).WithError(err).Error("failed to create refresh module payload")
+		ape.RenderErr(w, problems.InternalError())
+		return
 	}
 
 	for _, module := range modules {
-		err = helpers.MakeNoResponseRequest(data.RequestParams{
-			Method:     http.MethodPost,
-			Link:       module.Link + "/refresh/module",
-			AuthHeader: &authHeader,
-			Body:       nil,
-			Query:      nil,
+		requestData := data.Request{
+			ID:         uuid.New().String(),
+			FromUserID: fromUserId,
+			ToUserID:   toUserId,
+			Payload:    refreshModulePayload,
+			ModuleName: module.Name,
+			Status:     data.CREATED,
+		}
+
+		err = helpers.RequestsQ(r).Insert(requestData)
+		if err != nil {
+			helpers.Log(r).WithError(err).Error("failed to save new request")
+			ape.RenderErr(w, problems.InternalError())
+			return
+		}
+		helpers.Log(r).Infof("successfully created refresh request with id `%s`", requestData.ID)
+
+		marshalledRequests, err := json.Marshal(map[string]bool{requestData.ID: false})
+		if err != nil {
+			helpers.Log(r).WithError(err).Error("failed to marshal requests")
+			ape.RenderErr(w, problems.InternalError())
+			return
+		}
+		err = helpers.RequestTransactionsQ(r).Insert(data.RequestTransaction{
+			ID:       uuid.New().String(),
+			Action:   data.Single,
+			Requests: marshalledRequests,
 		})
 		if err != nil {
-			return errors.Wrap(err, "failed to make refresh request")
+			helpers.Log(r).WithError(err).Error("failed to save new request transaction")
+			ape.RenderErr(w, problems.InternalError())
+			return
 		}
 	}
 
-	return nil
+	helpers.Log(r).Infof("successfully created requests to refresh all")
+	w.WriteHeader(http.StatusAccepted)
+	ape.Render(w, http.StatusAccepted)
 }

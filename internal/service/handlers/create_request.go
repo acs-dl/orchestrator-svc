@@ -1,7 +1,11 @@
 package handlers
 
 import (
+	"encoding/json"
 	"fmt"
+	"net/http"
+	"strconv"
+
 	"github.com/google/uuid"
 	"gitlab.com/distributed_lab/acs/orchestrator/internal/data"
 	"gitlab.com/distributed_lab/acs/orchestrator/internal/service/helpers"
@@ -9,8 +13,6 @@ import (
 	"gitlab.com/distributed_lab/acs/orchestrator/resources"
 	"gitlab.com/distributed_lab/ape"
 	"gitlab.com/distributed_lab/ape/problems"
-	"net/http"
-	"strconv"
 )
 
 func CreateRequest(w http.ResponseWriter, r *http.Request) {
@@ -60,6 +62,23 @@ func CreateRequest(w http.ResponseWriter, r *http.Request) {
 	err = helpers.RequestsQ(r).Insert(requestData)
 	if err != nil {
 		helpers.Log(r).WithError(err).Error("failed to save new request")
+		ape.RenderErr(w, problems.InternalError())
+		return
+	}
+
+	marshalledRequests, err := json.Marshal(map[string]bool{requestData.ID: false})
+	if err != nil {
+		helpers.Log(r).WithError(err).Error("failed to marshal requests")
+		ape.RenderErr(w, problems.InternalError())
+		return
+	}
+	err = helpers.RequestTransactionsQ(r).Insert(data.RequestTransaction{
+		ID:       uuid.New().String(),
+		Action:   data.Single,
+		Requests: marshalledRequests,
+	})
+	if err != nil {
+		helpers.Log(r).WithError(err).Error("failed to save new request transaction")
 		ape.RenderErr(w, problems.InternalError())
 		return
 	}

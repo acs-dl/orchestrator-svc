@@ -2,9 +2,11 @@ package processor
 
 import (
 	"encoding/json"
+	"net/http"
+	"time"
 
 	"gitlab.com/distributed_lab/acs/orchestrator/internal/data"
-	"gitlab.com/distributed_lab/acs/orchestrator/internal/service/handlers"
+	"gitlab.com/distributed_lab/acs/orchestrator/internal/service/helpers"
 	"gitlab.com/distributed_lab/acs/orchestrator/internal/types"
 	"gitlab.com/distributed_lab/logan/v3/errors"
 )
@@ -21,7 +23,16 @@ func (p *processor) handleGetModulesPermissions(msg types.QueueOutput) error {
 	moduleRoles[data.ModuleName] = getOrchestratorPermissions()
 
 	for _, module := range modules {
-		res, err := handlers.MakeGetRolesRequest(module.Link, "/user_roles")
+		res, err := helpers.MakeGetRolesRequest(data.RequestParams{
+			Method: http.MethodGet,
+			Link:   module.Link + "/user_roles",
+			Body:   nil,
+			Header: map[string]string{
+				"Content-Type": "application/json",
+			},
+			Query:   nil,
+			Timeout: 30 * time.Second,
+		})
 		if err != nil {
 			p.log.WithError(err).Errorf("failed to get user roles from `%s`", module.Link+"/user_roles")
 			return errors.Wrap(err, "failed to get user roles")
@@ -39,7 +50,7 @@ func (p *processor) handleGetModulesPermissions(msg types.QueueOutput) error {
 		return err
 	}
 
-	err = p.sender.SendMessageToCustomChannel("auth", p.sender.BuildPermissionsMessage(*msg.RequestId, moduleRolesJson))
+	err = p.sender.SendMessageToCustomChannel(data.AuthService, p.sender.BuildPermissionsMessage(*msg.RequestId, moduleRolesJson))
 	if err != nil {
 		p.log.WithError(err).Errorf("failed to send message to custom channel")
 		return err

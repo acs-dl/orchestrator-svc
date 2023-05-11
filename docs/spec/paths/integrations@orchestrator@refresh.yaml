@@ -3,7 +3,7 @@ post:
     - Refresh
   summary: Refresh
   operationId: refresh
-  description: Endpoint for refreshing modules or submodules.
+  description: Endpoint for refreshing all modules.
   requestBody:
     content:
       application/json:
@@ -12,7 +12,7 @@ post:
           properties:
             data:
               type: object
-              $ref: '#/components/schemas/Refresh'
+              $ref: '#/components/schemas/FromToUser'
   responses:
     '202':
       description: Accepted

@@ -2,12 +2,12 @@ package handlers
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/pkg/errors"
 	"gitlab.com/distributed_lab/acs/orchestrator/internal/data"
 	"gitlab.com/distributed_lab/acs/orchestrator/internal/service/helpers"
 	"gitlab.com/distributed_lab/acs/orchestrator/internal/service/requests"
@@ -24,9 +24,16 @@ func DeleteUserById(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userId, err := strconv.ParseInt(request.Id, 10, 64)
+	userId, err := strconv.ParseInt(request.Data.Attributes.ToUser, 10, 64)
 	if err != nil {
-		helpers.Log(r).WithError(err).Errorf("failed to parse user id `%s`", request.Id)
+		helpers.Log(r).WithError(err).Errorf("failed to parse to user id `%s`", request.Data.Attributes.ToUser)
+		ape.RenderErr(w, problems.BadRequest(err)...)
+		return
+	}
+
+	fromUserId, err := strconv.ParseInt(request.Data.Attributes.ToUser, 10, 64)
+	if err != nil {
+		helpers.Log(r).WithError(err).Errorf("failed to parse from user id `%s`", request.Data.Attributes.FromUser)
 		ape.RenderErr(w, problems.BadRequest(err)...)
 		return
 	}
@@ -45,19 +52,28 @@ func DeleteUserById(w http.ResponseWriter, r *http.Request) {
 
 	var userinfoModules = make([]resources.User, 0)
 	for i, module := range modules {
-		returned, err := helpers.MakeGetUserRequest(module.Link, request.Id, int64(i))
+		response, err := helpers.MakeGetUserRequest(data.RequestParams{
+			Method: http.MethodGet,
+			Link:   fmt.Sprintf(module.Link+"/users/%s", userId),
+			Header: map[string]string{
+				"Content-Type": "application/json",
+			},
+			Body:    nil,
+			Query:   nil,
+			Timeout: 30 * time.Second,
+		}, int64(i))
 		if err != nil {
-			helpers.Log(r).WithError(err).Errorf("failed to get user with id `%s` from module `%s`", request.Id, module.Name)
+			helpers.Log(r).WithError(err).Errorf("failed to get user with id `%s` from module `%s`", request.Data.Attributes.ToUser, module.Name)
 			ape.RenderErr(w, problems.InternalError())
 			return
 		}
-		if returned == nil {
+		if response == nil {
 			continue
 		}
-		userinfoModules = append(userinfoModules, *returned)
+		userinfoModules = append(userinfoModules, *response)
 	}
 
-	requestToCheck := make([]string, 0)
+	var requestToCheck map[string]bool
 	for _, userinfoModule := range userinfoModules {
 		module, err := helpers.ModulesQ(r).FilterByNames(userinfoModule.Attributes.Module).Get()
 		if err != nil {
@@ -85,7 +101,7 @@ func DeleteUserById(w http.ResponseWriter, r *http.Request) {
 
 		requestData := data.Request{
 			ID:         uuid.New().String(),
-			FromUserID: *request.FromUserId,
+			FromUserID: fromUserId,
 			ToUserID:   userId,
 			Payload:    deleteUserJson,
 			ModuleName: module.Name,
@@ -99,83 +115,27 @@ func DeleteUserById(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		requestToCheck = append(requestToCheck, requestData.ID)
+		requestToCheck[requestData.ID] = false
 		helpers.Log(r).Infof("successfully created request with id `%s`", requestData.ID)
 	}
 
-	err = waitForRequestsToHandleInModules(r, requestToCheck)
+	marshalledRequests, err := json.Marshal(requestToCheck)
 	if err != nil {
-		helpers.Log(r).WithError(err).Error("failed to wait request handling")
+		helpers.Log(r).WithError(err).Error("failed to marshal requests")
 		ape.RenderErr(w, problems.InternalError())
 		return
 	}
-
-	err = checkIdentityRegisteredAndMakeDeleteUserRequest(helpers.ModulesQ(r), request.Id, r.Header.Get("Authorization"))
-	if err != nil {
-		helpers.Log(r).WithError(err).Error("failed to check identity and make delete request")
-		ape.RenderErr(w, problems.InternalError())
-		return
-	}
-
-	helpers.Log(r).Infof("successfully created requests to delete user with id `%s` from modules", request.Id)
-	ape.Render(w, http.StatusAccepted)
-}
-
-func waitForRequestsToHandleInModules(r *http.Request, requests []string) error {
-	helpers.Log(r).Infof("started waiting to handle requests")
-
-	for len(requests) != 0 {
-		msgRequests, err := helpers.RequestsQ(r).FilterByIDs(requests...).Select()
-		if err != nil {
-			return errors.Wrap(err, "failed to select requests to check")
-		}
-
-		if len(msgRequests) == 0 {
-			return errors.Errorf("no request returned")
-		}
-
-		for i, request := range msgRequests {
-			if request.Status == data.FINISHED {
-				requests = append(requests[:i], requests[i+1:]...)
-				helpers.Log(r).Infof("request `%s` was handled `%d` more left", request.ID, len(requests))
-				continue
-			}
-			if request.Status == data.FAILED {
-				errMsg := ""
-				if request.Error != nil {
-					errMsg = *request.Error
-				}
-				return errors.Errorf("request `%s` returned error `%s`", request.ID, errMsg)
-			}
-		}
-
-		time.Sleep(5 * time.Second)
-	}
-
-	helpers.Log(r).Infof("finished waiting to handle requests")
-	return nil
-}
-
-func checkIdentityRegisteredAndMakeDeleteUserRequest(moduleQ data.ModuleQ, userId, authHeader string) error {
-	module, err := moduleQ.FilterByNames("identity").Get()
-	if err != nil {
-		return errors.Wrap(err, "failed to get identity module")
-	}
-
-	if module == nil {
-		return errors.Errorf("no module with name `identity`")
-	}
-
-	err = helpers.MakeNoResponseRequest(data.RequestParams{
-		Method:     http.MethodDelete,
-		Link:       module.Link + "/users/" + userId,
-		AuthHeader: &authHeader,
-		Body:       nil,
-		Query:      nil,
+	err = helpers.RequestTransactionsQ(r).Insert(data.RequestTransaction{
+		ID:       uuid.New().String(),
+		Action:   data.Single,
+		Requests: marshalledRequests,
 	})
 	if err != nil {
-		return errors.Wrap(err, "failed to make delete user request")
+		helpers.Log(r).WithError(err).Error("failed to save new request transaction")
+		ape.RenderErr(w, problems.InternalError())
+		return
 	}
 
-	return nil
+	helpers.Log(r).Infof("successfully created requests to delete user with id `%s` from modules", request.Data.Attributes.ToUser)
+	ape.Render(w, http.StatusAccepted)
 }

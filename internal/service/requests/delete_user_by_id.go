@@ -1,25 +1,21 @@
 package requests
 
 import (
+	"encoding/json"
 	"net/http"
 
-	"github.com/go-chi/chi"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
-	"gitlab.com/distributed_lab/urlval"
+	"gitlab.com/distributed_lab/acs/orchestrator/resources"
 )
 
 type DeleteUserByIdRequest struct {
-	Id         string
-	FromUserId *int64 `filter:"fromUserId"`
+	Data resources.Request `json:"data"`
 }
 
 func NewDeleteUserByIdRequest(r *http.Request) (*DeleteUserByIdRequest, error) {
 	var request DeleteUserByIdRequest
 
-	request.Id = chi.URLParam(r, "id")
-
-	err := urlval.Decode(r.URL.Query(), &request)
-	if err != nil {
+	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
 		return nil, err
 	}
 
@@ -28,7 +24,7 @@ func NewDeleteUserByIdRequest(r *http.Request) (*DeleteUserByIdRequest, error) {
 
 func (r *DeleteUserByIdRequest) validate() error {
 	return validation.Errors{
-		"id":           validation.Validate(&r.Id, validation.Required),
-		"from_user_id": validation.Validate(&r.FromUserId, validation.Required),
+		"to_user_id":   validation.Validate(&r.Data.Attributes.ToUser, validation.Required),
+		"from_user_id": validation.Validate(&r.Data.Attributes.FromUser, validation.Required),
 	}.Filter()
 }

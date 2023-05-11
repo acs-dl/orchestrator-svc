@@ -26,6 +26,7 @@ func (s *service) router() chi.Router {
 			helpers.CtxLog(s.log),
 			helpers.CtxModulesQ(s.modulesQ),
 			helpers.CtxRequestsQ(s.requestsQ),
+			helpers.CtxRequestTransactionsQ(s.requestTransactionsQ),
 			helpers.CtxSender(sender.NewSender(s.publisher, s.requestsQ, s.modulesQ)),
 			helpers.CtxRawDB(s.rawDB),
 			helpers.CtxPublisher(s.publisher),
@@ -42,8 +43,9 @@ func (s *service) router() chi.Router {
 
 		r.With(auth.Jwt(s.jwt.Secret, "orchestrator", []string{"read", "write"}...)).
 			Post("/estimate_refresh", handlers.GetEstimatedRefreshTime)
+
 		r.With(auth.Jwt(s.jwt.Secret, "orchestrator", []string{"write"}...)).
-			Post("/refresh", handlers.Refresh)
+			Post("/refresh", handlers.RefreshAllModules)
 
 		r.Route("/modules", func(r chi.Router) {
 			r.Post("/", handlers.RegisterModule)           // comes from modules
@@ -75,7 +77,7 @@ func (s *service) router() chi.Router {
 			r.With(auth.Jwt(s.jwt.Secret, "orchestrator", []string{"read", "write"}...)).
 				Get("/{id}", handlers.GetUserById)
 			r.With(auth.Jwt(s.jwt.Secret, "orchestrator", []string{"read", "write"}...)).
-				Delete("/{id}", handlers.DeleteUserById)
+				Delete("/", handlers.DeleteUserById)
 		})
 	})
 
@@ -85,7 +87,7 @@ func (s *service) router() chi.Router {
 func (s *service) startListener(ctx context.Context) error {
 	s.log.Info("Starting listener")
 
-	receiver.NewReceiver(s.subscriber, s.modulesQ, s.requestsQ, sender.NewSender(s.publisher, s.requestsQ, s.modulesQ)).Run(ctx)
+	receiver.NewReceiver(s.subscriber, s.modulesQ, s.requestsQ, sender.NewSender(s.publisher, s.requestsQ, s.modulesQ), s.requestTransactionsQ).Run(ctx)
 	return nil
 }
 

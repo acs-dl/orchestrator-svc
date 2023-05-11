@@ -18,6 +18,7 @@ const (
 	logCtxKey ctxKey = iota
 	modulesQCtxKey
 	requestsQCtxKey
+	requestTransactionsQCtxKey
 	senderCtxKey
 	rawDBCtxKey
 	publisherCtxKey
@@ -52,6 +53,16 @@ func CtxRequestsQ(entry data.RequestQ) func(context.Context) context.Context {
 
 func RequestsQ(r *http.Request) data.RequestQ {
 	return r.Context().Value(requestsQCtxKey).(data.RequestQ)
+}
+
+func CtxRequestTransactionsQ(entry data.RequestTransactions) func(context.Context) context.Context {
+	return func(ctx context.Context) context.Context {
+		return context.WithValue(ctx, requestTransactionsQCtxKey, entry)
+	}
+}
+
+func RequestTransactionsQ(r *http.Request) data.RequestTransactions {
+	return r.Context().Value(requestTransactionsQCtxKey).(data.RequestTransactions)
 }
 
 func CtxSender(entry *sender.Sender) func(context.Context) context.Context {

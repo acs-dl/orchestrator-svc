@@ -1,10 +1,16 @@
 package data
 
 import (
+	"io"
+	"net/http"
+	"time"
+
 	"gitlab.com/distributed_lab/acs/orchestrator/resources"
 )
 
 const (
+	AuthService = "auth"
+
 	ModuleName         = "orchestrator"
 	RemoveModuleAction = "remove_module"
 	DeleteUserAction   = "delete_user"
@@ -45,9 +51,16 @@ type ModuleRolesResponse struct {
 }
 
 type RequestParams struct {
-	Method     string
-	Link       string
-	Body       []byte
-	Query      map[string]string
-	AuthHeader *string
+	Method  string
+	Link    string
+	Body    []byte
+	Query   map[string]string
+	Header  map[string]string
+	Timeout time.Duration
+}
+
+type ResponseParams struct {
+	Body       io.ReadCloser
+	Header     http.Header
+	StatusCode int
 }

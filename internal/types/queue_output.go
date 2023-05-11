@@ -6,6 +6,7 @@ type ModuleResult string
 
 const (
 	ModuleResultSuccess ModuleResult = "success"
+	ModuleResultInvited ModuleResult = "invited"
 	ModuleResultFailure ModuleResult = "failure"
 )
 
@@ -18,9 +19,12 @@ type QueueOutput struct {
 }
 
 func (mr ModuleResult) ToRequestStatus() data.RequestStatus {
-	if mr == ModuleResultSuccess {
+	switch mr {
+	case ModuleResultSuccess:
 		return data.FINISHED
+	case ModuleResultInvited:
+		return data.INVITED
+	default:
+		return data.FAILED
 	}
-
-	return data.FAILED
 }
