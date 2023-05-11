@@ -1,6 +1,8 @@
 package postgres
 
 import (
+	"database/sql"
+
 	sq "github.com/Masterminds/squirrel"
 	"github.com/fatih/structs"
 	"github.com/pkg/errors"
@@ -32,13 +34,20 @@ func (m modulesQ) FilterByNames(names ...string) data.ModuleQ {
 	return m
 }
 
+func (m modulesQ) FilterByIsModule(isModule bool) data.ModuleQ {
+	stmt := sq.Eq{modulesTable + ".is_module": isModule}
+	m.selectBuilder = m.selectBuilder.Where(stmt)
+	return m
+}
+
 func (m modulesQ) Get() (*data.Module, error) {
 	var result data.Module
 	err := m.db.Get(&result, m.selectBuilder)
-	if err != nil {
-		return nil, err
+	if err == sql.ErrNoRows {
+		return nil, nil
 	}
-	return &result, nil
+
+	return &result, err
 }
 
 func (m modulesQ) Select() ([]data.Module, error) {
@@ -48,7 +57,23 @@ func (m modulesQ) Select() ([]data.Module, error) {
 }
 
 func (m modulesQ) Insert(module data.Module) error {
-	insertStmt := sq.Insert(modulesTable).SetMap(structs.Map(module))
+	insertStmt := sq.Insert(modulesTable).SetMap(structs.Map(module)).Suffix("ON CONFLICT (name) DO NOTHING")
 	err := m.db.Exec(insertStmt)
 	return errors.Wrap(err, "failed to insert module")
+}
+
+func (m modulesQ) Delete(name string) error {
+	query := sq.Delete(modulesTable).Where(sq.Eq{"name": name})
+
+	result, err := m.db.ExecWithResult(query)
+	if err != nil {
+		return err
+	}
+
+	affectedRows, _ := result.RowsAffected()
+	if affectedRows == 0 {
+		return errors.New("no module with such name")
+	}
+
+	return nil
 }

@@ -3,10 +3,21 @@ log:
   disable_sentry: true
 
 db:
-  url: db_url
+  url: "postgres://orchestrator:orchestrator@localhost:5432/orchestrator?sslmode=disable"
+
+publisher:
+  amqp_url: "amqp://guest:guest@localhost:5672/"
+
+subscriber:
+  amqp_url: "amqp://guest:guest@localhost:5672/"
 
 listener:
   addr: :8000
+
+jwt:
+  secret: SuPeR SeCrEt PhRaSe
+  refresh_life: 6h
+  access_life: 10m5s
 
 cop:
   disabled: true

@@ -15,4 +15,5 @@ allOf:
           - user
         properties:
           user:
+            type: object
             $ref: '#/components/schemas/UserKey'

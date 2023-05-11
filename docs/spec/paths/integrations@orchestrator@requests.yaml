@@ -22,3 +22,32 @@ post:
               data:
                 type: object
                 $ref: '#/components/schemas/Request'
+get:
+  tags: [ Requests ]
+  summary: Get requests
+  operationId: getRequests
+  parameters:
+    - $ref: '#/components/parameters/fromUserIdParam'
+    - $ref: '#/components/parameters/toUserIdParam'
+    - $ref: '#/components/parameters/statusParam'
+    - $ref: '#/components/parameters/actionParam'
+  responses:
+    '200':
+      description: Success
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                type: array
+                items:
+                  type: object
+                  $ref: '#/components/schemas/Request'
+              meta:
+                type: object
+                properties:
+                  total_count:
+                    type: integer
+                    format: int64
+                    description: Total number of requests

@@ -2,26 +2,31 @@ package sender
 
 import (
 	"context"
+	"time"
+
+	"github.com/ThreeDotsLabs/watermill-amqp/v2/pkg/amqp"
 	"github.com/ThreeDotsLabs/watermill/message"
 	"github.com/pkg/errors"
 	"gitlab.com/distributed_lab/acs/orchestrator/internal/data"
 	"gitlab.com/distributed_lab/logan/v3"
 	"gitlab.com/distributed_lab/running"
-	"time"
 )
 
 const serviceName = "sender"
 
 type Sender struct {
-	publisher *message.Publisher
+	publisher *amqp.Publisher
 	requestQ  data.RequestQ
+	moduleQ   data.ModuleQ
 	log       *logan.Entry
 }
 
-func NewSender(publisher *message.Publisher, requestQ data.RequestQ) *Sender {
+func NewSender(publisher *amqp.Publisher, requestQ data.RequestQ, moduleQ data.ModuleQ) *Sender {
 	return &Sender{
 		publisher: publisher,
 		requestQ:  requestQ,
+		moduleQ:   moduleQ,
+		log:       logan.New().WithField("service", serviceName),
 	}
 }
 
@@ -45,7 +50,17 @@ func (s *Sender) processMessages(ctx context.Context) error {
 
 	for _, message := range messagesToSend {
 		s.log.Debug("started processing notification with id ", message.ID)
-		err = (*s.publisher).Publish(*message.Module.Endpoint, s.buildMessage(message))
+
+		module, err := s.moduleQ.FilterByNames(message.ModuleName).Get()
+		if err != nil {
+			return errors.Wrap(err, "failed to get full module for notification: "+message.ID)
+		}
+
+		if module == nil {
+			return errors.Errorf("no module was found for notification:" + message.ID)
+		}
+
+		err = s.publisher.Publish(module.Topic, s.buildMessage(message))
 		if err != nil {
 			return errors.Wrap(err, "failed to process notification: "+message.ID)
 		}
@@ -66,5 +81,23 @@ func (s *Sender) buildMessage(request data.Request) *message.Message {
 		UUID:     request.ID,
 		Metadata: nil,
 		Payload:  message.Payload(request.Payload),
+	}
+}
+
+func (s *Sender) SendMessageToCustomChannel(topic string, msg *message.Message) error {
+	err := (*s.publisher).Publish(topic, msg)
+	if err != nil {
+		s.log.WithError(err).Errorf("failed to send msg `%s to `%s`", msg.UUID, topic)
+		return errors.Wrap(err, "failed to send msg: "+msg.UUID)
+	}
+
+	return nil
+}
+
+func (s *Sender) BuildPermissionsMessage(uuid string, payload []byte) *message.Message {
+	return &message.Message{
+		UUID:     uuid,
+		Metadata: nil,
+		Payload:  payload,
 	}
 }

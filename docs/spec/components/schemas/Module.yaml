@@ -8,13 +8,33 @@ allOf:
         type: object
         required:
           - name
-          - endpoint
+          - title
+          - topic
+          - link
+          - prefix
+          - is_module
         properties:
           name:
             type: string
             description: Module name
             example: "github"
-          endpoint:
+          link:
             type: string
             description: Module url
-            example: "https://github-module"
+            example: "https://traefik/gitlab"
+          topic:
+            type: string
+            description: Module topic for sender and others
+            example: "gitlab"
+          prefix:
+            type: string
+            description: Module prefix to use in FE
+            example: "https://gitlab.com"
+          title:
+            type: string
+            description: Module name to use in FE
+            example: "Gitlab"
+          is_module:
+            type: bool
+            description: indicates whether module (gitlab, telegram etc.) or service (unverified, role etc.)
+            example: true

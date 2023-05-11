@@ -1,7 +1,9 @@
 package postgres
 
 import (
+	"database/sql"
 	"fmt"
+
 	sq "github.com/Masterminds/squirrel"
 	"github.com/fatih/structs"
 	"github.com/pkg/errors"
@@ -52,10 +54,10 @@ func (r requestsQ) JoinsModule() data.RequestQ {
 func (r requestsQ) Get() (*data.Request, error) {
 	var result data.Request
 	err := r.db.Get(&result, r.selectBuilder)
-	if err != nil {
-		return nil, err
+	if err == sql.ErrNoRows {
+		return nil, nil
 	}
-	return &result, nil
+	return &result, err
 }
 
 func (r requestsQ) Select() ([]data.Request, error) {
@@ -77,7 +79,54 @@ func (r requestsQ) Update(request data.Request) error {
 }
 
 func (r requestsQ) SetStatus(status data.RequestStatus) error {
-	r.updateBuilder = r.updateBuilder.Set("status", status)
-	err := r.db.Exec(r.updateBuilder)
+	updateStmt := r.updateBuilder.Set("status", status)
+	err := r.db.Exec(updateStmt)
 	return errors.Wrap(err, "failed to set status")
+}
+
+func (r requestsQ) SetStatusError(status data.RequestStatus, errorMsg string) error {
+	updateStmt := r.updateBuilder.Set("status", status).Set("error", errorMsg)
+	err := r.db.Exec(updateStmt)
+	return errors.Wrap(err, "failed to set status and error")
+}
+
+func (r requestsQ) FilterByFromIds(ids ...int64) data.RequestQ {
+	stmt := sq.Eq{requestsTable + ".from_user_id": ids}
+	r.selectBuilder = r.selectBuilder.Where(stmt)
+	r.updateBuilder = r.updateBuilder.Where(stmt)
+	return r
+}
+
+func (r requestsQ) FilterByToIds(ids ...int64) data.RequestQ {
+	stmt := sq.Eq{requestsTable + ".to_user_id": ids}
+	r.selectBuilder = r.selectBuilder.Where(stmt)
+	r.updateBuilder = r.updateBuilder.Where(stmt)
+	return r
+}
+
+func (r requestsQ) FilterNotByActions(actions ...string) data.RequestQ {
+	stmt := sq.NotEq{requestsTable + ".payload->>'action'": actions}
+	r.selectBuilder = r.selectBuilder.Where(stmt)
+	r.updateBuilder = r.updateBuilder.Where(stmt)
+	return r
+}
+
+func (r requestsQ) Count() data.RequestQ {
+	r.selectBuilder = sq.Select("COUNT (*)").From(requestsTable)
+
+	return r
+}
+
+func (r requestsQ) GetTotalCount() (int64, error) {
+	var count int64
+
+	err := r.db.Get(&count, r.selectBuilder)
+
+	return count, err
+}
+
+func (r requestsQ) Page(pageParams pgdb.OffsetPageParams) data.RequestQ {
+	r.selectBuilder = pageParams.ApplyTo(r.selectBuilder, "created_at")
+
+	return r
 }

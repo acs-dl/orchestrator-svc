@@ -1,12 +1,13 @@
 package handlers
 
 import (
+	"net/http"
+
 	"gitlab.com/distributed_lab/acs/orchestrator/internal/data"
 	"gitlab.com/distributed_lab/acs/orchestrator/internal/service/helpers"
 	"gitlab.com/distributed_lab/acs/orchestrator/internal/service/requests"
 	"gitlab.com/distributed_lab/ape"
 	"gitlab.com/distributed_lab/ape/problems"
-	"net/http"
 )
 
 func RegisterModule(w http.ResponseWriter, r *http.Request) {
@@ -19,7 +20,11 @@ func RegisterModule(w http.ResponseWriter, r *http.Request) {
 
 	module := data.Module{
 		Name:     request.Data.Attributes.Name,
-		Endpoint: &request.Data.Attributes.Endpoint,
+		Title:    request.Data.Attributes.Title,
+		Topic:    request.Data.Attributes.Topic,
+		Link:     request.Data.Attributes.Link,
+		Prefix:   request.Data.Attributes.Prefix,
+		IsModule: request.Data.Attributes.IsModule,
 	}
 
 	err = helpers.ModulesQ(r).Insert(module)
@@ -29,5 +34,6 @@ func RegisterModule(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	helpers.Log(r).Infof("successfully register module `%s`", module.Name)
 	ape.Render(w, http.StatusAccepted)
 }

@@ -1,0 +1,20 @@
+allOf:
+  - $ref: "#/components/schemas/LinkKey"
+  - type: object
+    required:
+      - attributes
+    properties:
+      attributes:
+        type: object
+        required:
+          - link
+          - is_exists
+        properties:
+          link:
+            type: string
+            description: link to repository or group
+            example: "distributed_lab/acs"
+          is_exists:
+            type: boolean
+            description: flag to indicate whether link exists or not
+            example: "true"

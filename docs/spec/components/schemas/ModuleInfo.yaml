@@ -1,0 +1,25 @@
+allOf:
+  - $ref: '#/components/schemas/ModuleKey'
+  - type: object
+    required:
+      - attributes
+    properties:
+      attributes:
+        type: object
+        required:
+          - name
+          - icon
+          - prefix
+        properties:
+          name:
+            type: string
+            description: Module name
+            example: "github"
+          icon:
+            type: string
+            description: Module icon url
+            example: "https://traefik/gitlab"
+          prefix:
+            type: string
+            description: Module prefix to use in FE
+            example: "+"

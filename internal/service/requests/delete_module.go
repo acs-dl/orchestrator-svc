@@ -1,8 +1,8 @@
 package requests
 
 import (
-	"gitlab.com/distributed_lab/logan/v3/errors"
-	"gitlab.com/distributed_lab/urlval"
+	"github.com/go-chi/chi"
+	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"net/http"
 )
 
@@ -13,6 +13,13 @@ type DeleteModuleRequest struct {
 func NewDeleteModuleRequest(r *http.Request) (DeleteModuleRequest, error) {
 	var request DeleteModuleRequest
 
-	err := urlval.Decode(r.URL.Query(), &request)
-	return request, errors.Wrap(err, "failed to parse request")
+	request.ModuleName = chi.URLParam(r, "name")
+
+	return request, request.validate()
+}
+
+func (r *DeleteModuleRequest) validate() error {
+	return validation.Errors{
+		"module_name": validation.Validate(&r.ModuleName, validation.Required),
+	}.Filter()
 }

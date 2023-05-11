@@ -1,0 +1,53 @@
+get:
+  tags: [ Users ]
+  summary: Get user by id
+  operationId: getUserById
+  parameters:
+    - $ref: '#/components/parameters/userIdParam'
+  responses:
+    '200':
+      description: Success
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                type: array
+                items:
+                  type: object
+                  $ref: '#/components/schemas/User'
+delete:
+  tags: [ Users ]
+  summary: Delete user by id
+  operationId: deleteUserById
+  requestBody:
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            data:
+              type: object
+              properties:
+                attributes:
+                  type: object
+                  required:
+                    - from_user
+                    - to_user
+                  properties:
+                    from_user:
+                      type: string
+                      description: user's id who send request
+                      example: "1"
+                    to_user:
+                      type: string
+                      description: user's id for who request was sent
+                      example: "2"
+  responses:
+    '202':
+      description: Accepted
+    '400':
+      description: Bad request.
+    '500':
+      description: Internal server error.

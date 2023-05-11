@@ -4,6 +4,7 @@ import (
 	"context"
 )
 
+// Publisher is the emitting part of a Pub/Sub.
 type Publisher interface {
 	// Publish publishes provided messages to given topic.
 	//
@@ -18,6 +19,7 @@ type Publisher interface {
 	Close() error
 }
 
+// Subscriber is the consuming part of the Pub/Sub.
 type Subscriber interface {
 	// Subscribe returns output channel with messages from provided topic.
 	// Channel is closed, when Close() was called on the subscriber.
@@ -33,11 +35,12 @@ type Subscriber interface {
 	Close() error
 }
 
+// SubscribeInitializer is used to initialize subscribers.
 type SubscribeInitializer interface {
 	// SubscribeInitialize can be called to initialize subscribe before consume.
 	// When calling Subscribe before Publish, SubscribeInitialize should be not required.
 	//
-	// Not every Pub/Sub requires this initialize and it may be optional for performance improvements etc.
+	// Not every Pub/Sub requires this initialization, and it may be optional for performance improvements etc.
 	// For detailed SubscribeInitialize functionality, please check Pub/Subs godoc.
 	//
 	// Implementing SubscribeInitialize is not obligatory.

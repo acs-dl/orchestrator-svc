@@ -1,0 +1,8 @@
+name: filter[fromUserId]
+in: path
+description: The identity id of the user from who was action
+required: false
+schema:
+  type: integer
+  format: int64
+  example: 111

@@ -1,26 +1,43 @@
 -- +migrate Up
 
-CREATE TYPE request_status_enum AS ENUM ('created', 'pending', 'finished', 'failed');
+create type request_status_enum as enum ('pending', 'in progress', 'success', 'invited', 'failed');
+create type transaction_action_enum as enum ('single','delete_user');
 
-CREATE TABLE IF NOT EXISTS modules
-(
-    name TEXT PRIMARY KEY,
-    endpoint TEXT NOT NULL,
+create table if not exists modules (
+    name text primary key,
+    title text not null,
+    topic text not null,
+    prefix text not null,
+    link text not null,
+    is_module boolean not null default false -- in table `modules` except `gitlab`, `github` and other can be `unverified-svc`, `identity-svc`, but in some cases i need only modules such `telegram`, `gitlab`
 );
 
-CREATE TABLE IF NOT EXISTS requests (
-    id UUID PRIMARY KEY,
-    from_user_id BIGINT NOT NULL,
-    to_user_id BIGINT NOT NULL,
-    payload JSONB NOT NULL,
-    status request_status_enum NOT NULL DEFAULT 'created',
-    error TEXT,
-    created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT fk_modules_name FOREIGN KEY (module_name) REFERENCES modules (name) ON DELETE CASCADE,
+create table if not exists requests (
+    id uuid primary key,
+    from_user_id bigint not null,
+    to_user_id bigint not null,
+    payload jsonb not null,
+    status request_status_enum not null default 'pending',
+    module_name text not null,
+    error text,
+    description text,
+    created_at timestamp without time zone not null default current_timestamp,
+    constraint fk_modules_name foreign key (module_name) references modules (name) on delete cascade
+);
+
+create index requests_payload_action_ids on requests ((payload ->> 'action'));
+
+create table if not exists request_transactions(
+    id uuid primary key,
+    action transaction_action_enum not null,
+    requests jsonb not null  --map[uuid]:bool - to check whether request was handled
 );
 
 -- +migrate Down
 
-DROP TABLE IF EXISTS modules;
-DROP TABLE IF EXISTS requests;
-DROP TYPE IF EXISTS request_status_enum;
+drop table if exists request_transactions;
+drop index if exists requests_payload_action_ids;
+drop table if exists requests;
+drop table if exists modules;
+drop type if exists request_status_enum;
+drop type if exists transaction_action_enum;

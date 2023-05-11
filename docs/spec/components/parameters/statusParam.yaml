@@ -1,0 +1,7 @@
+name: 'filter[status]'
+in: path
+description: The status of request
+required: false
+schema:
+  type: string
+  example: "pending"

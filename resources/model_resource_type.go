@@ -8,7 +8,11 @@ type ResourceType string
 
 // List of ResourceType
 const (
-	MODULES  ResourceType = "modules"
-	REQUESTS ResourceType = "requests"
-	USERS    ResourceType = "users"
+	ESTIMATED_TIME ResourceType = "estimated_time"
+	LINKS          ResourceType = "links"
+	MODULES        ResourceType = "modules"
+	REFRESH        ResourceType = "refresh"
+	REQUESTS       ResourceType = "requests"
+	ROLE           ResourceType = "role"
+	USERS          ResourceType = "users"
 )

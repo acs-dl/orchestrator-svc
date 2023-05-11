@@ -1,6 +1,7 @@
 package figure
 
 import (
+	"gitlab.com/distributed_lab/logan/v3"
 	"reflect"
 
 	"strings"
@@ -14,9 +15,9 @@ var (
 )
 
 type Tag struct {
-	Key        string
-	Required   bool
-	NonZero    bool
+	Key      string
+	Required bool
+	NonZero  bool
 }
 
 func parseFieldTag(field reflect.StructField, tagKey string) (*Tag, error) {
@@ -41,7 +42,9 @@ func parseFieldTag(field reflect.StructField, tagKey string) (*Tag, error) {
 
 	if len(splitedTag) > 1 {
 		if contains(splitedTag, ignore) {
-			return nil, ErrConflictingAttributes
+			return nil, errors.From(ErrConflictingAttributes, logan.F{
+				"tag": fieldTag,
+			})
 		}
 
 		for _, rule := range splitedTag[1:] {
@@ -51,7 +54,9 @@ func parseFieldTag(field reflect.StructField, tagKey string) (*Tag, error) {
 			case nonZero:
 				tag.NonZero = true
 			default:
-				return nil, ErrUnknownAttribute
+				return nil, errors.From(ErrUnknownAttribute, logan.F{
+					"tag": fieldTag,
+				})
 			}
 		}
 	}

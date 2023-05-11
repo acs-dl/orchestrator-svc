@@ -2,7 +2,9 @@ package service
 
 import (
 	"context"
+
 	"github.com/go-chi/chi"
+	auth "gitlab.com/distributed_lab/acs/auth/middlewares"
 	"gitlab.com/distributed_lab/acs/orchestrator/internal/receiver"
 	"gitlab.com/distributed_lab/acs/orchestrator/internal/sender"
 	"gitlab.com/distributed_lab/acs/orchestrator/internal/service/handlers"
@@ -24,15 +26,58 @@ func (s *service) router() chi.Router {
 			helpers.CtxLog(s.log),
 			helpers.CtxModulesQ(s.modulesQ),
 			helpers.CtxRequestsQ(s.requestsQ),
+			helpers.CtxRequestTransactionsQ(s.requestTransactionsQ),
+			helpers.CtxSender(sender.NewSender(s.publisher, s.requestsQ, s.modulesQ)),
+			helpers.CtxRawDB(s.rawDB),
+			helpers.CtxPublisher(s.publisher),
+			helpers.CtxSubscriber(s.subscriber),
 		),
 	)
+
 	r.Route("/integrations/orchestrator", func(r chi.Router) {
-		r.Route("/modules", func(r chi.Router) {
-			r.Post("/", handlers.RegisterModule)
-			r.Delete("/{name}", handlers.UnregisterModule)
+		r.Route("/health", func(r chi.Router) {
+			r.Get("/live", handlers.CheckHealthLive)
+			r.Get("/ready", handlers.CheckHealthReady)
+			r.Get("/status", handlers.CheckHealthStatus)
 		})
+
+		r.With(auth.Jwt(s.jwt.Secret, "orchestrator", []string{"read", "write"}...)).
+			Post("/estimate_refresh", handlers.GetEstimatedRefreshTime)
+
+		r.With(auth.Jwt(s.jwt.Secret, "orchestrator", []string{"write"}...)).
+			Post("/refresh", handlers.RefreshAllModules)
+
+		r.Route("/modules", func(r chi.Router) {
+			r.Post("/", handlers.RegisterModule)           // comes from modules
+			r.Delete("/{name}", handlers.UnregisterModule) // comes from modules
+
+			r.With(auth.Jwt(s.jwt.Secret, "orchestrator", []string{"read", "write"}...)).
+				Get("/", handlers.GetModules)
+		})
+
+		r.With(auth.Jwt(s.jwt.Secret, "orchestrator", []string{"read", "write"}...)).
+			Get("/role", handlers.GetRole)
+
+		r.With(auth.Jwt(s.jwt.Secret, "orchestrator", []string{"read", "write"}...)).
+			Get("/roles", handlers.GetRoles)
+
+		r.With(auth.Jwt(s.jwt.Secret, "orchestrator", []string{"read", "write"}...)).
+			Get("/submodule", handlers.CheckSubmodule)
+
 		r.Route("/requests", func(r chi.Router) {
-			r.Post("/", handlers.CreateRequest)
+			r.With(auth.Jwt(s.jwt.Secret, "orchestrator", []string{"write"}...)).
+				Post("/", handlers.CreateRequest)
+			r.With(auth.Jwt(s.jwt.Secret, "orchestrator", []string{"read", "write"}...)).
+				Get("/", handlers.GetRequests)
+			r.With(auth.Jwt(s.jwt.Secret, "orchestrator", []string{"read", "write"}...)).
+				Get("/{id}", handlers.GetRequest)
+		})
+
+		r.Route("/users", func(r chi.Router) {
+			r.With(auth.Jwt(s.jwt.Secret, "orchestrator", []string{"read", "write"}...)).
+				Get("/{id}", handlers.GetUserById)
+			r.With(auth.Jwt(s.jwt.Secret, "orchestrator", []string{"read", "write"}...)).
+				Delete("/", handlers.DeleteUserById)
 		})
 	})
 
@@ -41,12 +86,13 @@ func (s *service) router() chi.Router {
 
 func (s *service) startListener(ctx context.Context) error {
 	s.log.Info("Starting listener")
-	receiver.NewReceiver(s.subscriber, s.modulesQ, s.requestsQ).Run(ctx)
+
+	receiver.NewReceiver(s.subscriber, s.modulesQ, s.requestsQ, sender.NewSender(s.publisher, s.requestsQ, s.modulesQ), s.requestTransactionsQ).Run(ctx)
 	return nil
 }
 
 func (s *service) startSender(ctx context.Context) error {
 	s.log.Info("Starting sender")
-	sender.NewSender(s.publisher, s.requestsQ).Run(ctx)
+	sender.NewSender(s.publisher, s.requestsQ, s.modulesQ).Run(ctx)
 	return nil
 }

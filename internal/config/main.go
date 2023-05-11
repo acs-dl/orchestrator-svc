@@ -1,7 +1,7 @@
 package config
 
 import (
-	"github.com/ThreeDotsLabs/watermill/message"
+	"github.com/ThreeDotsLabs/watermill-amqp/v2/pkg/amqp"
 	"gitlab.com/distributed_lab/kit/comfig"
 	"gitlab.com/distributed_lab/kit/copus"
 	"gitlab.com/distributed_lab/kit/copus/types"
@@ -14,8 +14,9 @@ type Config interface {
 	pgdb.Databaser
 	types.Copuser
 	comfig.Listenerer
-	Publisher() *message.Publisher
-	Subscriber() *message.Subscriber
+	Publisher() *amqp.Publisher
+	Subscriber() *amqp.Subscriber
+	JwtParams() *JwtCfg
 }
 
 type config struct {
@@ -27,6 +28,7 @@ type config struct {
 
 	subscriber comfig.Once
 	publisher  comfig.Once
+	jwtCfg     comfig.Once
 }
 
 func New(getter kv.Getter) Config {

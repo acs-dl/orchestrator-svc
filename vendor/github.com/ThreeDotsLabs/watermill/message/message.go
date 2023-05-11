@@ -12,10 +12,13 @@ func init() {
 	close(closedchan)
 }
 
+// Payload is the Message's payload.
 type Payload []byte
 
+// Message is the basic transfer unit.
+// Messages are emitted by Publishers and received by Subscribers.
 type Message struct {
-	// UUID is an unique identifier of message.
+	// UUID is a unique identifier of message.
 	//
 	// It is only used by Watermill for debugging.
 	// UUID can be empty.
@@ -23,13 +26,13 @@ type Message struct {
 
 	// Metadata contains the message metadata.
 	//
-	// Can be used to store data which doesn't require unmarshaling entire payload.
+	// Can be used to store data which doesn't require unmarshalling the entire payload.
 	// It is something similar to HTTP request's headers.
 	//
-	// Metadata is marshaled and will be saved to PubSub.
+	// Metadata is marshaled and will be saved to the PubSub.
 	Metadata Metadata
 
-	// Payload is message's payload.
+	// Payload is the message's payload.
 	Payload Payload
 
 	// ack is closed, when acknowledge is received.
@@ -43,6 +46,7 @@ type Message struct {
 	ctx context.Context
 }
 
+// NewMessage creates a new Message with given uuid and payload.
 func NewMessage(uuid string, payload Payload) *Message {
 	return &Message{
 		UUID:     uuid,
@@ -133,12 +137,13 @@ func (m *Message) Nack() bool {
 // Acked returns channel which is closed when acknowledgement is sent.
 //
 // Usage:
-// 		select {
-//		case <-message.Acked():
-// 			// ack received
-//		case <-message.Nacked():
-//			// nack received
-//		}
+//
+//	select {
+//	case <-message.Acked():
+//		// ack received
+//	case <-message.Nacked():
+//		// nack received
+//	}
 func (m *Message) Acked() <-chan struct{} {
 	return m.ack
 }
@@ -146,12 +151,13 @@ func (m *Message) Acked() <-chan struct{} {
 // Nacked returns channel which is closed when negative acknowledgement is sent.
 //
 // Usage:
-// 		select {
-//		case <-message.Acked():
-// 			// ack received
-//		case <-message.Nacked():
-//			// nack received
-//		}
+//
+//	select {
+//	case <-message.Acked():
+//		// ack received
+//	case <-message.Nacked():
+//		// nack received
+//	}
 func (m *Message) Nacked() <-chan struct{} {
 	return m.noAck
 }
