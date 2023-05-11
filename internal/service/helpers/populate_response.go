@@ -2,35 +2,13 @@ package helpers
 
 import (
 	"encoding/json"
-	"fmt"
-	"net/http"
 
+	"gitlab.com/distributed_lab/acs/orchestrator/internal/data"
 	"gitlab.com/distributed_lab/acs/orchestrator/resources"
 	"gitlab.com/distributed_lab/logan/v3/errors"
 )
 
-func MakeGetUserRequest(moduleLink, userId string, counter int64) (*resources.User, error) {
-	link := fmt.Sprintf(moduleLink+"/users/%s", userId)
-	req, err := http.NewRequest(http.MethodGet, link, nil)
-	if err != nil {
-		return nil, errors.Wrap(err, "couldn't create request")
-	}
-
-	req.Header.Set("Content-Type", "application/json")
-
-	res, err := http.DefaultClient.Do(req)
-	if err != nil {
-		return nil, errors.Wrap(err, "error making http request")
-	}
-
-	if res.StatusCode == 404 {
-		return nil, nil
-	}
-
-	if res.StatusCode < 200 || res.StatusCode >= 300 {
-		return nil, errors.New(fmt.Sprintf("error in response, status %s", res.Status))
-	}
-
+func populateGetUserResponse(res *data.ResponseParams, counter int64) (*resources.User, error) {
 	response := struct {
 		Data struct {
 			Attributes struct {
@@ -44,8 +22,8 @@ func MakeGetUserRequest(moduleLink, userId string, counter int64) (*resources.Us
 		} `json:"data"`
 	}{}
 
-	if err = json.NewDecoder(res.Body).Decode(&response); err != nil {
-		return nil, errors.Wrap(err, " failed to unmarshal body")
+	if err := json.NewDecoder(res.Body).Decode(&response); err != nil {
+		return nil, errors.Wrap(err, "failed to unmarshal body")
 	}
 
 	return &resources.User{

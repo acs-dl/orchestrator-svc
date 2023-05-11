@@ -1,16 +1,14 @@
 package handlers
 
 import (
-	"encoding/json"
-	"fmt"
 	"net/http"
+	"time"
 
 	"gitlab.com/distributed_lab/acs/orchestrator/internal/data"
 	"gitlab.com/distributed_lab/acs/orchestrator/internal/service/helpers"
 	"gitlab.com/distributed_lab/acs/orchestrator/resources"
 	"gitlab.com/distributed_lab/ape"
 	"gitlab.com/distributed_lab/ape/problems"
-	"gitlab.com/distributed_lab/logan/v3/errors"
 )
 
 func GetRoles(w http.ResponseWriter, r *http.Request) {
@@ -30,7 +28,16 @@ func GetRoles(w http.ResponseWriter, r *http.Request) {
 	}
 
 	for _, module := range modules {
-		moduleRoles, err := MakeGetRolesRequest(module.Link, "/roles")
+		moduleRoles, err := helpers.MakeGetRolesRequest(data.RequestParams{
+			Method: http.MethodGet,
+			Link:   module.Link + "/roles",
+			Body:   nil,
+			Header: map[string]string{
+				"Content-Type": "application/json",
+			},
+			Query:   nil,
+			Timeout: 30 * time.Second,
+		})
 		if err != nil {
 			helpers.Log(r).WithError(err).Infof("failed to get roles from `%s`", module.Link+"/roles")
 			ape.RenderErr(w, problems.InternalError())
@@ -40,34 +47,6 @@ func GetRoles(w http.ResponseWriter, r *http.Request) {
 	}
 
 	ape.Render(w, response)
-}
-
-func MakeGetRolesRequest(moduleLink, endpoint string) (*data.ModuleRolesResponse, error) {
-	link := fmt.Sprintf(moduleLink + endpoint)
-
-	req, err := http.NewRequest(http.MethodGet, link, nil)
-	if err != nil {
-		return nil, errors.Wrap(err, "couldn't create request")
-	}
-
-	req.Header.Set("Content-Type", "application/json")
-
-	res, err := http.DefaultClient.Do(req)
-	if err != nil {
-		return nil, errors.Wrap(err, "error making http request")
-	}
-
-	if res.StatusCode < 200 || res.StatusCode >= 300 {
-		return nil, errors.New(fmt.Sprintf("error in response, status %s", res.Status))
-	}
-
-	var returned data.ModuleRolesResponse
-
-	if err := json.NewDecoder(res.Body).Decode(&returned); err != nil {
-		return nil, errors.Wrap(err, " failed to unmarshal body")
-	}
-
-	return &returned, nil
 }
 
 func newModulesRolesResponse() data.ModulesRolesResponse {

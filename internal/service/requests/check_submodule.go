@@ -7,7 +7,7 @@ import (
 )
 
 type CheckSubmoduleRequest struct {
-	ModuleName *string `filter:"moduleName"`
+	ModuleName *string `filter:"module_name"`
 	Submodule  *string `filter:"submodule"`
 }
 

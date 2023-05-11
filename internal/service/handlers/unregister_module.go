@@ -39,7 +39,7 @@ func UnregisterModule(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = helpers.Sender(r).SendMessageToCustomChannel("auth", helpers.Sender(r).BuildPermissionsMessage(msgId, moduleNameJson))
+	err = helpers.Sender(r).SendMessageToCustomChannel(data.AuthService, helpers.Sender(r).BuildPermissionsMessage(msgId, moduleNameJson))
 	if err != nil {
 		helpers.Log(r).WithError(err).Errorf("failed to send message to custom channel")
 		ape.RenderErr(w, problems.InternalError())

@@ -67,17 +67,20 @@ func getEstimatedRefreshModuleSubmodules(modulesQ data.ModuleQ, moduleName, auth
 		return nil, errors.New("no such module")
 	}
 
-	body, err := createJsonSubmodulesBody(submodules)
+	body, err := helpers.CreateJsonSubmodulesBody(submodules)
 	if err != nil {
 		return nil, err
 	}
 
 	estimatedTime, err := helpers.MakeGetEstimatedTimeRequest(data.RequestParams{
-		Method:     http.MethodPost,
-		Link:       module.Link + "/estimate_refresh/submodule",
-		AuthHeader: &authHeader,
-		Body:       body,
-		Query:      nil,
+		Method: http.MethodPost,
+		Link:   module.Link + "/estimate_refresh/submodule",
+		Header: map[string]string{
+			"Authorization": authHeader,
+		},
+		Body:    body,
+		Query:   nil,
+		Timeout: 30 * time.Second,
 	})
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to make refresh request")
@@ -88,7 +91,7 @@ func getEstimatedRefreshModuleSubmodules(modulesQ data.ModuleQ, moduleName, auth
 		return nil, errors.Wrap(err, "failed to round duration")
 	}
 
-	estimatedTime.Data.Attributes.EstimatedTime = roundedTime.String()
+	estimatedTime.Data.Attributes.EstimatedTime = (roundedTime + (1 * time.Minute)).String()
 
 	return estimatedTime, nil
 }
@@ -104,11 +107,14 @@ func getEstimatedRefreshModule(modulesQ data.ModuleQ, moduleName, authHeader str
 	}
 
 	estimatedTime, err := helpers.MakeGetEstimatedTimeRequest(data.RequestParams{
-		Method:     http.MethodPost,
-		Link:       module.Link + "/estimate_refresh/module",
-		AuthHeader: &authHeader,
-		Body:       nil,
-		Query:      nil,
+		Method: http.MethodPost,
+		Link:   module.Link + "/estimate_refresh/module",
+		Header: map[string]string{
+			"Authorization": authHeader,
+		},
+		Body:    nil,
+		Query:   nil,
+		Timeout: 30 * time.Second,
 	})
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to make refresh request")
@@ -119,7 +125,7 @@ func getEstimatedRefreshModule(modulesQ data.ModuleQ, moduleName, authHeader str
 		return nil, errors.Wrap(err, "failed to round duration")
 	}
 
-	estimatedTime.Data.Attributes.EstimatedTime = roundedTime.String()
+	estimatedTime.Data.Attributes.EstimatedTime = (roundedTime + (1 * time.Minute)).String()
 
 	return estimatedTime, nil
 }
@@ -133,11 +139,14 @@ func getEstimatedRefreshModules(modulesQ data.ModuleQ, authHeader string) (*reso
 	var estimatedTime time.Duration
 	for _, module := range modules {
 		moduleEstimatedTime, err := helpers.MakeGetEstimatedTimeRequest(data.RequestParams{
-			Method:     http.MethodPost,
-			Link:       module.Link + "/estimate_refresh/module",
-			AuthHeader: &authHeader,
-			Body:       nil,
-			Query:      nil,
+			Method: http.MethodPost,
+			Link:   module.Link + "/estimate_refresh/module",
+			Header: map[string]string{
+				"Authorization": authHeader,
+			},
+			Body:    nil,
+			Query:   nil,
+			Timeout: 30 * time.Second,
 		})
 		if err != nil {
 			return nil, errors.Wrap(err, "failed to make refresh request")
@@ -154,7 +163,7 @@ func getEstimatedRefreshModules(modulesQ data.ModuleQ, authHeader string) (*reso
 		}
 	}
 
-	response := NewEstimatedTimeResponse(estimatedTime.String())
+	response := NewEstimatedTimeResponse((estimatedTime + (1 * time.Minute)).String())
 	return &response, nil
 }
 
