@@ -54,7 +54,7 @@ func DeleteUserById(w http.ResponseWriter, r *http.Request) {
 	for i, module := range modules {
 		response, err := helpers.MakeGetUserRequest(data.RequestParams{
 			Method: http.MethodGet,
-			Link:   fmt.Sprintf(module.Link+"/users/%s", userId),
+			Link:   fmt.Sprintf(module.Link+"/users/%d", userId),
 			Header: map[string]string{
 				"Content-Type": "application/json",
 			},
@@ -73,7 +73,7 @@ func DeleteUserById(w http.ResponseWriter, r *http.Request) {
 		userinfoModules = append(userinfoModules, *response)
 	}
 
-	var requestToCheck map[string]bool
+	var requestToCheck = make(map[string]bool)
 	for _, userinfoModule := range userinfoModules {
 		module, err := helpers.ModulesQ(r).FilterByNames(userinfoModule.Attributes.Module).Get()
 		if err != nil {
@@ -127,7 +127,7 @@ func DeleteUserById(w http.ResponseWriter, r *http.Request) {
 	}
 	err = helpers.RequestTransactionsQ(r).Insert(data.RequestTransaction{
 		ID:       uuid.New().String(),
-		Action:   data.Single,
+		Action:   data.DeleteUser,
 		Requests: marshalledRequests,
 	})
 	if err != nil {
