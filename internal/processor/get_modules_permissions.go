@@ -50,7 +50,7 @@ func (p *processor) handleGetModulesPermissions(msg types.QueueOutput) error {
 		return err
 	}
 
-	err = p.sender.SendMessageToCustomChannel(data.AuthService, p.sender.BuildPermissionsMessage(*msg.RequestId, moduleRolesJson))
+	err = p.sender.SendMessageToCustomChannel(p.authTopic, p.sender.BuildPermissionsMessage(*msg.RequestId, moduleRolesJson))
 	if err != nil {
 		p.log.WithError(err).Errorf("failed to send message to custom channel")
 		return err

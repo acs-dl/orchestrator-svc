@@ -2,8 +2,11 @@ package sender
 
 import (
 	"context"
-	"gitlab.com/distributed_lab/logan/v3"
 	"time"
+
+	"github.com/acs-dl/orchestrator-svc/internal/config"
+	"github.com/acs-dl/orchestrator-svc/internal/data/postgres"
+	"gitlab.com/distributed_lab/logan/v3"
 
 	"github.com/ThreeDotsLabs/watermill-amqp/v2/pkg/amqp"
 	"github.com/ThreeDotsLabs/watermill/message"
@@ -21,12 +24,12 @@ type Sender struct {
 	log       *logan.Entry
 }
 
-func NewSender(publisher *amqp.Publisher, requestQ data.RequestQ, moduleQ data.ModuleQ) *Sender {
+func NewSender(cfg config.Config) *Sender {
 	return &Sender{
-		publisher: publisher,
-		requestQ:  requestQ,
-		moduleQ:   moduleQ,
-		log:       logan.New().WithField("service", serviceName),
+		publisher: cfg.Publisher(),
+		requestQ:  postgres.NewRequestsQ(cfg.DB().Clone()),
+		moduleQ:   postgres.NewModuleQ(cfg.DB().Clone()),
+		log:       cfg.Log().WithField("service", serviceName),
 	}
 }
 

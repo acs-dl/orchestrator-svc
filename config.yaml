@@ -8,7 +8,12 @@ db:
 publisher:
   amqp_url: "amqp://guest:guest@localhost:5672/"
 
+amqp:
+  auth: "auth"
+  orchestrator: "orchestrator"
+
 subscriber:
+  orchestrator: "orchestrator"
   amqp_url: "amqp://guest:guest@localhost:5672/"
 
 listener:
