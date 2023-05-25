@@ -22,20 +22,22 @@ type Processor interface {
 }
 
 type processor struct {
-	log      *logan.Entry
-	modulesQ data.ModuleQ
-	sender   *sender.Sender
+	log       *logan.Entry
+	modulesQ  data.ModuleQ
+	sender    *sender.Sender
+	authTopic string
 }
 
 var handleActions = map[string]func(proc *processor, msg types.QueueOutput) error{
 	GetModulesPermissionsAction: (*processor).handleGetModulesPermissions,
 }
 
-func NewProcessor(modulesQ data.ModuleQ, sender *sender.Sender) Processor {
+func NewProcessor(modulesQ data.ModuleQ, sender *sender.Sender, authTopic string) Processor {
 	return &processor{
-		log:      logan.New().WithField("service", serviceName),
-		modulesQ: modulesQ,
-		sender:   sender,
+		log:       logan.New().WithField("service", serviceName),
+		modulesQ:  modulesQ,
+		sender:    sender,
+		authTopic: authTopic,
 	}
 }
 

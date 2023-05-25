@@ -3,6 +3,6 @@
 config.*.yaml
 docs/node_modules
 docs/web_deploy
-orchestrator
+orchestrator-svc
 docker-compose.yml
 /public

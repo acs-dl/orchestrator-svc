@@ -9,7 +9,8 @@ import (
 )
 
 type SubscriberConfig struct {
-	AmqpUrl string `fig:"amqp_url,required"`
+	AmqpUrl           string `fig:"amqp_url,required"`
+	OrchestratorTopic string `fig:"orchestrator,required"`
 }
 
 func (c *config) Subscriber() *amqp.Subscriber {
@@ -26,7 +27,7 @@ func (c *config) Subscriber() *amqp.Subscriber {
 			panic(errors.Wrap(err, "failed to figure out subscriber config"))
 		}
 
-		amqpConfig := amqp.NewDurablePubSubConfig(cfg.AmqpUrl, amqp.GenerateQueueNameTopicNameWithSuffix("orchestrator"))
+		amqpConfig := amqp.NewDurablePubSubConfig(cfg.AmqpUrl, amqp.GenerateQueueNameTopicNameWithSuffix(cfg.OrchestratorTopic))
 		if err != nil {
 			panic(errors.Wrap(err, "failed to create subscriber config"))
 		}

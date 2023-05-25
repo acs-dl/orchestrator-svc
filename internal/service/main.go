@@ -1,14 +1,10 @@
 package service
 
 import (
-	"database/sql"
-	"gitlab.com/distributed_lab/logan/v3"
 	"net"
 	"net/http"
 
-	"github.com/ThreeDotsLabs/watermill-amqp/v2/pkg/amqp"
-	"github.com/acs-dl/orchestrator-svc/internal/data"
-	"github.com/acs-dl/orchestrator-svc/internal/data/postgres"
+	"gitlab.com/distributed_lab/logan/v3"
 
 	"github.com/acs-dl/orchestrator-svc/internal/config"
 	"gitlab.com/distributed_lab/kit/copus/types"
@@ -16,16 +12,10 @@ import (
 )
 
 type service struct {
-	log                  *logan.Entry
-	copus                types.Copus
-	listener             net.Listener
-	modulesQ             data.ModuleQ
-	requestsQ            data.RequestQ
-	requestTransactionsQ data.RequestTransactions
-	publisher            *amqp.Publisher
-	subscriber           *amqp.Subscriber
-	jwt                  *config.JwtCfg
-	rawDB                *sql.DB
+	log      *logan.Entry
+	copus    types.Copus
+	listener net.Listener
+	cfg      config.Config
 }
 
 func (s *service) run() error {
@@ -41,16 +31,10 @@ func (s *service) run() error {
 
 func newService(cfg config.Config) *service {
 	return &service{
-		log:                  cfg.Log(),
-		copus:                cfg.Copus(),
-		listener:             cfg.Listener(),
-		modulesQ:             postgres.NewModuleQ(cfg.DB().Clone()),
-		requestsQ:            postgres.NewRequestsQ(cfg.DB().Clone()),
-		requestTransactionsQ: postgres.NewRequestTransactionsQ(cfg.DB().Clone()),
-		publisher:            cfg.Publisher(),
-		subscriber:           cfg.Subscriber(),
-		jwt:                  cfg.JwtParams(),
-		rawDB:                cfg.RawDB(),
+		log:      cfg.Log(),
+		copus:    cfg.Copus(),
+		listener: cfg.Listener(),
+		cfg:      cfg,
 	}
 }
 
