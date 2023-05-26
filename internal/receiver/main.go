@@ -4,15 +4,18 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"gitlab.com/distributed_lab/logan/v3"
 	"net/http"
 	"time"
+
+	"github.com/acs-dl/orchestrator-svc/internal/config"
+	"github.com/acs-dl/orchestrator-svc/internal/data/postgres"
+	"github.com/acs-dl/orchestrator-svc/internal/sender"
+	"gitlab.com/distributed_lab/logan/v3"
 
 	"github.com/ThreeDotsLabs/watermill-amqp/v2/pkg/amqp"
 	"github.com/ThreeDotsLabs/watermill/message"
 	"github.com/acs-dl/orchestrator-svc/internal/data"
 	"github.com/acs-dl/orchestrator-svc/internal/processor"
-	"github.com/acs-dl/orchestrator-svc/internal/sender"
 	"github.com/acs-dl/orchestrator-svc/internal/service/helpers"
 	"github.com/acs-dl/orchestrator-svc/internal/types"
 	"gitlab.com/distributed_lab/logan/v3/errors"
@@ -28,16 +31,22 @@ type Receiver struct {
 	requestsQ            data.RequestQ
 	requestTransactionsQ data.RequestTransactions
 	processor            processor.Processor
+	topic                string
 }
 
-func NewReceiver(subscriber *amqp.Subscriber, modulesQ data.ModuleQ, requestsQ data.RequestQ, sender *sender.Sender, requestTransactionsQ data.RequestTransactions) *Receiver {
+func NewReceiver(cfg config.Config) *Receiver {
 	return &Receiver{
-		subscriber:           subscriber,
-		log:                  logan.New().WithField("service", serviceName),
-		modulesQ:             modulesQ,
-		requestsQ:            requestsQ,
-		requestTransactionsQ: requestTransactionsQ,
-		processor:            processor.NewProcessor(modulesQ, sender),
+		subscriber:           cfg.Subscriber(),
+		log:                  cfg.Log().WithField("service", serviceName),
+		modulesQ:             postgres.NewModuleQ(cfg.DB().Clone()),
+		requestsQ:            postgres.NewRequestsQ(cfg.DB().Clone()),
+		requestTransactionsQ: postgres.NewRequestTransactionsQ(cfg.DB().Clone()),
+		processor: processor.NewProcessor(
+			postgres.NewModuleQ(cfg.DB().Clone()),
+			sender.NewSender(cfg),
+			cfg.Amqp().Auth,
+		),
+		topic: cfg.Amqp().Orchestrator,
 	}
 }
 
@@ -53,7 +62,7 @@ func (r *Receiver) Run(ctx context.Context) {
 
 func (r *Receiver) listenMessages(ctx context.Context) error {
 	r.log.Debug("started listening messages")
-	return r.subscribeForTopic(ctx, "orchestrator") //topic)
+	return r.subscribeForTopic(ctx, r.topic)
 }
 
 func (r *Receiver) subscribeForTopic(ctx context.Context, topic string) error {

@@ -3,8 +3,10 @@ package helpers
 import (
 	"context"
 	"database/sql"
-	"gitlab.com/distributed_lab/logan/v3"
 	"net/http"
+
+	"github.com/acs-dl/orchestrator-svc/internal/config"
+	"gitlab.com/distributed_lab/logan/v3"
 
 	"github.com/ThreeDotsLabs/watermill-amqp/v2/pkg/amqp"
 	"github.com/acs-dl/orchestrator-svc/internal/data"
@@ -22,6 +24,7 @@ const (
 	rawDBCtxKey
 	publisherCtxKey
 	subscriberCtxKey
+	amqpCfgCtxKey
 )
 
 func CtxLog(entry *logan.Entry) func(context.Context) context.Context {
@@ -106,4 +109,15 @@ func CtxSubscriber(entry *amqp.Subscriber) func(context.Context) context.Context
 
 func Subscriber(r *http.Request) *amqp.Subscriber {
 	return r.Context().Value(subscriberCtxKey).(*amqp.Subscriber)
+}
+
+func CtxAmqpCfg(entry *config.AmqpCfg) func(context.Context) context.Context {
+	return func(ctx context.Context) context.Context {
+		return context.WithValue(ctx, amqpCfgCtxKey, entry)
+	}
+
+}
+
+func AmqpCfg(r *http.Request) *config.AmqpCfg {
+	return r.Context().Value(amqpCfgCtxKey).(*config.AmqpCfg)
 }

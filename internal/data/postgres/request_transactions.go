@@ -50,7 +50,6 @@ func (r RequestTransactionsQ) FilterByRequestID(id string) data.RequestTransacti
 
 func (r RequestTransactionsQ) Get() (*data.RequestTransaction, error) {
 	var result data.RequestTransaction
-	fmt.Println(r.selectBuilder.MustSql())
 	err := r.db.Get(&result, r.selectBuilder)
 	if err == sql.ErrNoRows {
 		return nil, nil
