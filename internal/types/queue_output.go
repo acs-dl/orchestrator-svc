@@ -5,9 +5,10 @@ import "github.com/acs-dl/orchestrator-svc/internal/data"
 type ModuleResult string
 
 const (
-	ModuleResultSuccess ModuleResult = "success"
-	ModuleResultInvited ModuleResult = "invited"
-	ModuleResultFailure ModuleResult = "failure"
+	ModuleResultSuccess  ModuleResult = "success"
+	ModuleResultInvited  ModuleResult = "invited"
+	ModuleResultNotFound ModuleResult = "not found"
+	ModuleResultFailure  ModuleResult = "failure"
 )
 
 type QueueOutput struct {
@@ -24,6 +25,8 @@ func (mr ModuleResult) ToRequestStatus() data.RequestStatus {
 		return data.FINISHED
 	case ModuleResultInvited:
 		return data.INVITED
+	case ModuleResultNotFound:
+		return data.NOT_FOUND
 	default:
 		return data.FAILED
 	}

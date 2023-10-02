@@ -9,11 +9,12 @@ import (
 type RequestStatus string
 
 const (
-	CREATED  RequestStatus = "pending"
-	PENDING  RequestStatus = "in progress"
-	FINISHED RequestStatus = "success"
-	INVITED  RequestStatus = "invited"
-	FAILED   RequestStatus = "failed"
+	CREATED   RequestStatus = "pending"
+	PENDING   RequestStatus = "in progress"
+	FINISHED  RequestStatus = "success"
+	INVITED   RequestStatus = "invited"
+	NOT_FOUND RequestStatus = "not found"
+	FAILED    RequestStatus = "failed"
 )
 
 type Request struct {
